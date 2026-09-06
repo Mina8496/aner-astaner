@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 class RewardsPage extends StatefulWidget {
-  const RewardsPage({super.key});
+  final String? churchId;
+  final String? chapterId;
+  const RewardsPage({super.key, this.churchId, this.chapterId});
 
   @override
   State<RewardsPage> createState() => _RewardsPageState();
@@ -16,20 +19,36 @@ class RewardsPage extends StatefulWidget {
 
 class _RewardsPageState extends State<RewardsPage> {
   bool _isAdmin = false;
+  String? _churchId;
+  String? _chapterId;
 
   @override
   void initState() {
     super.initState();
     checkIfAdmin();
+    _resolveOrganization();
+  }
+
+  Future<void> _resolveOrganization() async {
+    if (widget.churchId != null && widget.chapterId != null) {
+      if (!mounted) return;
+      setState(() {
+        _churchId = widget.churchId;
+        _chapterId = widget.chapterId;
+      });
+      return;
+    }
+    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
+    if (!mounted) return;
+    setState(() {
+      _churchId = widget.churchId ?? profile?.churchId;
+      _chapterId = widget.chapterId ?? profile?.chapterId;
+    });
   }
 
   Future<void> checkIfAdmin() async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final doc = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(uid)
-        .get();
-    final role = doc.data()?["role"] ?? "user";
+    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
+    final role = profile?.role ?? "user";
 
     if (role == "Admin" || role == "SuperAdmin") {
       setState(() => _isAdmin = true);
@@ -57,13 +76,8 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   Future<void> addOrEditReward({String? docId, String? oldImageUrl}) async {
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-    final userDoc = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(uid)
-        .get();
-    final churchId = userDoc.data()?["churchId"];
-    final chapterId = userDoc.data()?["chapterId"];
+    final churchId = _churchId;
+    final chapterId = _chapterId;
     final titleController = TextEditingController();
     final descController = TextEditingController();
     Uint8List? newImageBytes;
@@ -219,124 +233,111 @@ class _RewardsPageState extends State<RewardsPage> {
               child: const Icon(Icons.add),
             )
           : null,
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection("users")
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .get(),
-        builder: (context, userSnapshot) {
-          if (!userSnapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: _churchId == null || _chapterId == null
+          ? const Center(child: CircularProgressIndicator())
+          : StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Rewards')
+                  .where("churchId", isEqualTo: _churchId)
+                  .where("chapterId", isEqualTo: _chapterId)
+                  .orderBy("createdAt", descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          final userData = userSnapshot.data!.data() as Map<String, dynamic>;
-          final churchId = userData["churchId"];
-          final chapterId = userData["chapterId"];
+                final rewards = snapshot.data!.docs;
 
-          return StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('Rewards')
-                .where("churchId", isEqualTo: churchId)
-                .where("chapterId", isEqualTo: chapterId)
-                .orderBy("createdAt", descending: true)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
+                if (rewards.isEmpty) {
+                  return const Center(child: Text("لا توجد جوائز بعد 🎁"));
+                }
 
-              final rewards = snapshot.data!.docs;
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: rewards.length,
+                  itemBuilder: (context, index) {
+                    final reward =
+                        rewards[index].data() as Map<String, dynamic>;
+                    final docId = rewards[index].id;
 
-              if (rewards.isEmpty) {
-                return const Center(child: Text("لا توجد جوائز بعد 🎁"));
-              }
-
-              return GridView.builder(
-                padding: const EdgeInsets.all(16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 0.7,
-                ),
-                itemCount: rewards.length,
-                itemBuilder: (context, index) {
-                  final reward = rewards[index].data() as Map<String, dynamic>;
-                  final docId = rewards[index].id;
-
-                  return Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(16),
-                            ),
-                            child: Image.network(
-                              reward['imageUrl'],
-                              fit: BoxFit.cover,
+                    return Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                              child: Image.network(
+                                reward['imageUrl'],
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                reward['title'] ?? '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  reward['title'] ?? '',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                reward['description'] ?? '',
-                                style: const TextStyle(fontSize: 13),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  reward['description'] ?? '',
+                                  style: const TextStyle(fontSize: 13),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        if (_isAdmin)
-                          OverflowBar(
-                            alignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.blue,
+                          if (_isAdmin)
+                            OverflowBar(
+                              alignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.blue,
+                                  ),
+                                  onPressed: () => addOrEditReward(
+                                    docId: docId,
+                                    oldImageUrl: reward['imageUrl'],
+                                  ),
                                 ),
-                                onPressed: () => addOrEditReward(
-                                  docId: docId,
-                                  oldImageUrl: reward['imageUrl'],
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () => deleteReward(docId),
                                 ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () => deleteReward(docId),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+                              ],
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
     );
   }
 }

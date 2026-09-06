@@ -64,7 +64,7 @@ class _AddNewCatgoryState extends State<AddNewCatgory> {
                       controller: title,
                       inputType: TextInputType.text,
                       obscureText: false,
-                      hintText: "ادخل اسم الاسفار والانجيل",
+                      hintText: "ادخل اسم السفر اوالانجيل",
                       textAlign: TextAlign.right,
                     ),
                   ),

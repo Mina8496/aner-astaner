@@ -12,8 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:just_audio/just_audio.dart';
 
 class VersesExamQuizPage extends StatefulWidget {
@@ -521,12 +520,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
 
-    final userDoc = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(uid)
-        .get();
-    // ignore: unnecessary_cast
-    final userData = userDoc.data() as Map<String, dynamic>?;
+    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
 
     final total = versesDocs.length;
     final percentage = total == 0 ? 0.0 : (scoreAyat / total) * 100.0;
@@ -536,9 +530,9 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
       'scoreAyat': scoreAyat,
       'totalQuestionsAyat': total,
       'percentageAyat': percentage.toStringAsFixed(1),
-      'full_name': userData?['full_name'],
-      'Church': userData?['Church'],
-      'ChurchID': userData?['ChurchID'],
+      'full_name': profile?.fullName,
+      'Church': profile?.church,
+      'ChurchID': profile?.churchId,
       'chapterID': widget.chapterID,
       'examChurchID': widget.churchID,
       'date': FieldValue.serverTimestamp(),
@@ -593,27 +587,6 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
           .update({"VersesExamDone": true});
       // مش هننقل مباشرة هنا لأن التطبيق ممكن يرجع
       // لكن لما يرجع نمنعه من الدخول تاني (Check access)
-      //////////////////////////////////////////////// ignore: unused_element///////////////////////////////////
-      void handleExit() async {
-        await saveUserResult();
-
-        // ضع علامة انتهاء الامتحان
-        final uid = FirebaseAuth.instance.currentUser?.uid;
-        if (uid != null) {
-          await FirebaseFirestore.instance.collection("users").doc(uid).update({
-            "VersesExamDone": true,
-          });
-        }
-
-        // ارجع للصفحة الرئيسية
-        if (mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const MasterHome()),
-            (route) => false,
-          );
-        }
-      }
     }
   }
 

@@ -1,6 +1,6 @@
-import 'package:aner_astaner/Presentation/Views/Adds_Category/Add_Exames_Alshahat_Box.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/widgets/Add_Exames_Alshahat_Box.dart';
 import 'package:aner_astaner/Presentation/Views/Category/Exames_Questions_Page.dart';
-import 'package:aner_astaner/features/exam_chapter/presentation/controllers/exam_chapter_controller.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_chapter/presentation/controllers/exam_chapter_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

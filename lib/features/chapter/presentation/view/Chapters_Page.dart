@@ -1,4 +1,4 @@
-import 'package:aner_astaner/Presentation/Views/Adds_Category/Add_Chapters_Box.dart';
+import 'package:aner_astaner/features/chapter/presentation/view/widgets/Add_Chapters_Box.dart';
 import 'package:aner_astaner/Presentation/Views/Category/Room_Page.dart';
 import 'package:aner_astaner/features/organization/domain/entities/organization_item.dart';
 import 'package:aner_astaner/features/organization/presentation/controllers/organization_controller.dart';

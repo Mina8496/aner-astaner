@@ -1,4 +1,4 @@
-import 'package:aner_astaner/features/bible_verses/presentation/controllers/bible_verse_controller.dart';
+import 'package:aner_astaner/features/bible_books/presentation/controllers/bible_verse_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

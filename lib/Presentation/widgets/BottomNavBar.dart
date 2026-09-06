@@ -1,6 +1,6 @@
 
-import 'package:aner_astaner/Presentation/Views/Category/All_Users_Results_Page.dart';
-import 'package:aner_astaner/Presentation/Views/Category/Church_Users_ResultsPage.dart';
+import 'package:aner_astaner/features/show_all_users_results_page/presentation/view/All_Users_Results_Page.dart';
+import 'package:aner_astaner/features/church_users_results/presentation/view/Church_Users_ResultsPage.dart';
 import 'package:aner_astaner/Presentation/Views/Home_page.dart';
 import 'package:aner_astaner/Presentation/Views/Music_page.dart';
 import 'package:flutter/material.dart';

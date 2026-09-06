@@ -1,8 +1,8 @@
-import 'package:aner_astaner/features/bible_verses/domain/entities/bible_verse.dart';
-import 'package:aner_astaner/features/bible_verses/presentation/controllers/bible_verse_controller.dart';
+import 'package:aner_astaner/features/bible_books/domain/entities/bible_verse.dart';
+import 'package:aner_astaner/features/bible_books/presentation/controllers/bible_verse_controller.dart';
+import 'package:aner_astaner/features/verses_exam_quiz/presentation/pages/widget/Add_Ayah_Dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'add_ayah_dialog.dart'; // استورد الملف السابق
 
 class AyatQuizAdminPage extends StatelessWidget {
   static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";

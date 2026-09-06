@@ -1,9 +1,9 @@
-import 'package:aner_astaner/Presentation/Views/Category/All_Exames_page.dart';
-import 'package:aner_astaner/Presentation/Views/Category/Ayat_Admin_Page.dart';
-import 'package:aner_astaner/Presentation/Views/Category/Data_Admain_churches_Page.dart';
+import 'package:aner_astaner/features/show_all_exams_page/presentation/view/All_Exames_page.dart';
+import 'package:aner_astaner/features/room_control/ayat_control/presentation/view/Ayat_Admin_Page.dart';
+import 'package:aner_astaner/features/room_control/class_servants/presentation/pages/search_users_page.dart';
 import 'package:aner_astaner/Presentation/Views/Category/ExamVersesSettingsDialog.dart';
-import 'package:aner_astaner/Presentation/Views/Category/Exam_Settings_Dialog.dart';
-import 'package:aner_astaner/Presentation/Views/Category/Exames_Alngel_Page.dart';
+import 'package:aner_astaner/features/room_control/exam_setting/presentation/pages/Exam_Settings_Dialog.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/Exames_Alngel_Page.dart';
 import 'package:aner_astaner/Presentation/Views/Category/Manage_Users_Tabs_Page.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';

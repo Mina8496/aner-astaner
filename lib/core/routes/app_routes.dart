@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../Presentation/Views/Adds_Category/AddNewCatgory.dart';
-import '../../Presentation/Views/Adds_Category/Add_churches_Box.dart';
-import '../../Presentation/Views/Category/Category_Page.dart';
-import '../../Presentation/Views/Category/Chapters_Page.dart';
-import '../../Presentation/Views/Category/Churches_Page.dart';
+import '../../features/Catgory-elanagel/presentation/view/AddNewCatgory.dart';
+import '../../features/Churches/presentation/view/widgets/Add_churches_Box.dart';
+import '../../features/Catgory-elanagel/presentation/view/Category_Page.dart';
+import '../../features/chapter/presentation/view/Chapters_Page.dart';
+import '../../features/Churches/presentation/view/Churches_Page.dart';
 import '../../Presentation/Views/Home_page.dart';
 import '../../Presentation/Views/Login/Completw_information_body.dart';
 import '../../Presentation/Views/Login/Inital_Login.dart';
 import '../../Presentation/Views/Login/Rigester_View.dart';
 import '../../Presentation/Views/Login/login_Page.dart';
 import '../../Presentation/Views/MasterHome_Page.dart';
-import '../../Presentation/on Bording/splash_body.dart';
+import '../../features/splash_page/presentation/view/splash_body.dart';
 import '../../Presentation/widgets/BottomNavBar.dart';
 
 abstract final class AppRoutes {

@@ -1,4 +1,5 @@
-import '../../../chapter/domain/entities/chapter_model.dart';
+
+import 'package:aner_astaner/features/chapter/domain/entities/chapter_model.dart';
 
 abstract interface class ExamChapterRepository {
   Stream<List<ChapterModel>> watchChapters({

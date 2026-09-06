@@ -1,4 +1,4 @@
-import 'package:aner_astaner/Presentation/Views/Adds_Category/Add_Qusstion_page.dart';
+import 'package:aner_astaner/features/question/presentation/view/Add_Qusstion_page.dart';
 import 'package:aner_astaner/Presentation/Views/Category/Exames_Edit_Questions_Page.dart';
 import 'package:flutter/material.dart';
 import 'package:aner_astaner/features/question/presentation/controllers/question_controller.dart';

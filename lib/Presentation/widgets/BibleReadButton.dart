@@ -1,4 +1,4 @@
-import 'package:aner_astaner/Presentation/Views/Bible_Books/Bible_Books_Page.dart';
+import 'package:aner_astaner/features/bible_books/presentation/view/Bible_Books_Page.dart';
 import 'package:flutter/material.dart';
 
 class BibleReadButton extends StatefulWidget {

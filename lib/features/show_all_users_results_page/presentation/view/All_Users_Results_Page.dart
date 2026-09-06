@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart' hide Rx;
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -20,10 +21,10 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
   List<String> timeFilters = ['الكل', 'اليوم', 'الأسبوع', 'الشهر', 'السنة'];
   List<String> bookTitles = [];
 
-  bool? pageEnabled; // 🔑 مفتاح تفعيل الصفحة
+  bool? pageEnabled; //  مفتاح تفعيل الصفحة
   String? currentRole;
 
-  StreamSubscription? _pageStatusSub; // ✅ علشان نلغي الاشتراك في dispose
+  StreamSubscription? _pageStatusSub; //  علشان نلغي الاشتراك في dispose
 
   @override
   void initState() {
@@ -47,17 +48,10 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
   }
 
   Future<void> fetchCurrentUserRole() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
-
-    final doc = await FirebaseFirestore.instance
-        .collection("users")
-        .doc(uid)
-        .get();
-
+    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
     if (!mounted) return;
     setState(() {
-      currentRole = doc.data()?['role'];
+      currentRole = profile?.role;
     });
   }
 
@@ -69,7 +63,7 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
     final titles = <String>{};
     for (var doc in snapshot.docs) {
       final data = doc.data();
-      if (data.containsKey('bookTitle')) {
+      if (data['bookTitle'] is String) {
         titles.add(data['bookTitle']);
       }
     }

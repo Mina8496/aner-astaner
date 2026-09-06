@@ -1,6 +1,6 @@
+import 'package:aner_astaner/features/chapter/domain/entities/chapter_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../chapter/domain/entities/chapter_model.dart';
 import '../../domain/repositories/exam_chapter_repository.dart';
 
 class FirestoreExamChapterRepository implements ExamChapterRepository {

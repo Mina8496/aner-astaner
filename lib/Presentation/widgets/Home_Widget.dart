@@ -1,10 +1,12 @@
 // ignore_for_file: unused_field, use_build_context_synchronously, unnecessary_cast
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:aner_astaner/Presentation/Views/Ayat_Quiz_Page.dart';
+import 'package:aner_astaner/features/organization/presentation/pages/widgets/org_selector_dialog.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_model.dart';
 import 'package:aner_astaner/features/user/domain/repositories/profile_image_uploader.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
-import 'package:aner_astaner/Presentation/Views/Category/Churches_Page.dart';
+import 'package:aner_astaner/features/Churches/presentation/view/Churches_Page.dart';
 import 'package:aner_astaner/Presentation/Views/Category/Exames_Quiz_Page.dart';
 import 'package:aner_astaner/Presentation/Views/Login/Completw_information_body.dart';
 import 'package:aner_astaner/Presentation/Views/RewardsPage.dart';
@@ -13,7 +15,7 @@ import 'package:aner_astaner/Presentation/widgets/BubbleTopTailPainter.dart';
 import 'package:aner_astaner/Presentation/widgets/ChatBubble.dart';
 import 'package:aner_astaner/Presentation/widgets/isUser_Approved_Or_Admin.dart';
 import 'package:aner_astaner/Presentation/widgets/showHowTo_Qussyion_Dialog.dart';
-import 'package:aner_astaner/features/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
 import 'package:aner_astaner/features/exam_settings/presentation/controllers/exam_settings_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -119,6 +121,25 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
       updateImageBasedOnTime();
       updateWelcomeText();
     });
+  }
+
+  Future<void> openOrgSelector() async {
+    final result = await showDialog<OrgSelectionResult>(
+      context: context,
+      builder: (_) => const OrgSelectorDialog(),
+    );
+    if (result == null || !mounted) return;
+
+    setState(() {
+      churchId = result.churchId;
+      chapterId = result.chapterId;
+      church = result.churchTitle;
+      season = result.chapterTitle;
+    });
+
+    await fetchChaptersByChurch();
+    await fetchAlnagel();
+    await fetchSavedExamSettings();
   }
 
   Future<void> fetchChaptersByChurch() async {
@@ -730,7 +751,7 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
                                                             ),
                                                           ),
                                                         ),
-                                                        // SizedBox(height: 10.h),
+                                                        //  "مسابقة الآيات"
                                                         SizedBox(height: 10.h),
                                                         ElevatedButton.icon(
                                                           onPressed: () {
@@ -738,8 +759,60 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
                                                               context,
                                                             );
                                                             Get.to(
-                                                              () =>
-                                                                  RewardsPage(),
+                                                              () => VersesExamQuizPage(
+                                                                churchID:
+                                                                    churchId!,
+                                                                chapterID:
+                                                                    chapterId!,
+                                                                alngelID:
+                                                                    activeSetting
+                                                                        .bookId!,
+                                                                alshahatID:
+                                                                    activeSetting
+                                                                        .chapterId!,
+                                                              ),
+                                                            );
+                                                          },
+                                                          icon: const Icon(
+                                                            Icons.menu_book,
+                                                            color: Colors.white,
+                                                          ),
+                                                          label: Text(
+                                                            "مسابقة الآيات",
+                                                            style: TextStyle(
+                                                              fontSize: 15.sp,
+                                                              color:
+                                                                  Colors.white,
+                                                            ),
+                                                          ),
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor:
+                                                                Colors.teal,
+                                                            minimumSize: Size(
+                                                              double.infinity,
+                                                              50.h,
+                                                            ),
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    12.dg,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(height: 10.h),
+                                                        ElevatedButton.icon(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                              context,
+                                                            );
+                                                            Get.to(
+                                                              () => RewardsPage(
+                                                                churchId:
+                                                                    churchId,
+                                                                chapterId:
+                                                                    chapterId,
+                                                              ),
                                                             );
                                                           },
                                                           icon: const Icon(
@@ -800,8 +873,8 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
                                       },
                                 icon: _isStartingExam
                                     ? SizedBox(
-                                        width: 20.h,
-                                        height: 20.h,
+                                        width: 15.w,
+                                        height: 15.h,
                                         child: const CircularProgressIndicator(
                                           color: Colors.indigo,
                                           strokeWidth: 2,
@@ -812,7 +885,7 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
                                   _isStartingExam ? "...تحميل" : "ابدأ الآن",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15.sp,
+                                    fontSize: 13.sp,
                                     color: Colors.indigo,
                                   ),
                                 ),
@@ -853,6 +926,25 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.deepOrange,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        10.dg,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            if (role == 'SuperAdmin')
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8.h),
+                                child: IconButton(
+                                  onPressed: openOrgSelector,
+                                  icon: const Icon(
+                                    Icons.swap_horiz,
+                                    color: Colors.white,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.teal,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
                                         10.dg,
