@@ -1,7 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:aner_astaner/features/app_update/domain/repositories/app_update_repository.dart';
 
 class ForceUpdateService {
   static bool _dialogShown = false;
@@ -10,34 +11,21 @@ class ForceUpdateService {
     try {
       final packageInfo = await PackageInfo.fromPlatform();
       final int currentVersion = int.tryParse(packageInfo.buildNumber) ?? 0;
-      final doc = await FirebaseFirestore.instance
-          .collection('AppSettings')
-          .doc('version')
-          .get();
 
-      if (!doc.exists) return;
-
-      final data = doc.data() ?? {};
-      final int minVersion = _parseVersion(data['minVersion']);
-      final int latestVersion = _parseVersion(data['latestVersion']);
-      final String message = data['updateMessage'] ?? 'يوجد تحديث جديد متاح';
+      final settings =
+          await Get.find<AppUpdateRepository>().fetchVersionSettings();
+      if (settings == null) return;
 
       if (_dialogShown) return;
 
-      if (currentVersion < minVersion) {
+      if (currentVersion < settings.minVersion) {
         _dialogShown = true;
-        _showForceDialog(context, message);
-      } else if (currentVersion < latestVersion) {
+        _showForceDialog(context, settings.message);
+      } else if (currentVersion < settings.latestVersion) {
         _dialogShown = true;
-        _showOptionalDialog(context, message);
+        _showOptionalDialog(context, settings.message);
       }
     } catch (_) {}
-  }
-
-  static int _parseVersion(dynamic value) {
-    if (value == null) return 0;
-    if (value is int) return value;
-    return int.tryParse(value.toString()) ?? 0;
   }
 
   static void _showForceDialog(BuildContext context, String message) {
