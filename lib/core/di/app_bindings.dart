@@ -1,5 +1,5 @@
-import 'package:aner_astaner/features/exam_catalog/data/repositories/firestore_exam_catalog_repository.dart';
-import 'package:aner_astaner/features/exam_catalog/domain/repositories/exam_catalog_repository.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/data/repositories/firestore_exam_catalog_repository.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/domain/repositories/exam_catalog_repository.dart';
 import 'package:aner_astaner/features/organization/data/repositories/firestore_organization_repository.dart';
 import 'package:aner_astaner/features/organization/domain/repositories/organization_repository.dart';
 import 'package:aner_astaner/features/user/data/repositories/firestore_user_repository.dart';
@@ -10,15 +10,17 @@ import 'package:get/get.dart';
 
 import '../../features/auth/data/services/auth_service.dart';
 import '../../features/audio/presentation/controllers/audio_controller.dart';
-import '../../features/bible_verses/presentation/controllers/bible_verse_controller.dart';
+import '../../features/bible_books/presentation/controllers/bible_verse_controller.dart';
 import '../../features/authorization/data/repositories/firestore_authorization_repository.dart';
 import '../../features/authorization/domain/repositories/authorization_repository.dart';
 import '../../features/category/presentation/controllers/category_controller.dart';
 import '../../features/exam/presentation/controllers/exam_controller.dart';
-import '../../features/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
+import '../../features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
 import '../../features/exam_settings/presentation/controllers/exam_settings_controller.dart';
 import '../../features/question/presentation/controllers/question_controller.dart';
 import '../../features/organization/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/features/app_update/data/repositories/firestore_app_update_repository.dart';
+import 'package:aner_astaner/features/app_update/domain/repositories/app_update_repository.dart';
 import '../../features/user/presentation/controllers/user_controller.dart';
 
 class AppBindings extends Bindings {
@@ -55,6 +57,10 @@ class AppBindings extends Bindings {
       () => OrganizationController(
         repository: Get.find<OrganizationRepository>(),
       ),
+      fenix: true,
+    );
+    Get.lazyPut<AppUpdateRepository>(
+      FirestoreAppUpdateRepository.new,
       fenix: true,
     );
     Get.lazyPut<UserRepository>(FirestoreUserRepository.new, fenix: true);
