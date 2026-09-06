@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../features/Catgory-elanagel/presentation/view/AddNewCatgory.dart';
+import '../../features/category/presentation/page/AddNewCatgory.dart';
 import '../../features/Churches/presentation/view/widgets/Add_churches_Box.dart';
-import '../../features/Catgory-elanagel/presentation/view/Category_Page.dart';
+import '../../features/category/presentation/page/Category_Page.dart';
 import '../../features/chapter/presentation/view/Chapters_Page.dart';
 import '../../features/Churches/presentation/view/Churches_Page.dart';
 import '../../features/home_page/presentation/page/Home_page.dart';
