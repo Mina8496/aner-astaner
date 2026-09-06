@@ -1,7 +1,7 @@
 // ignore_for_file: unused_element
 
-import 'package:aner_astaner/Presentation/Views/Category/Exames_Quiz_Page.dart';
-import 'package:aner_astaner/Presentation/Views/Login/Edit_User_Page.dart';
+import 'package:aner_astaner/features/multiple_choice_quiz/presentation/page/Exames_Quiz_Page.dart';
+import 'package:aner_astaner/features/Login/Edit_User_Page.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
