@@ -1,5 +1,5 @@
-import 'package:aner_astaner/features/Churches/presentation/view/widgets/Add_churches_Box.dart';
-import 'package:aner_astaner/features/chapter/presentation/view/Chapters_Page.dart';
+import 'package:aner_astaner/features/Churches/presentation/page/widgets/Add_churches_Box.dart';
+import 'package:aner_astaner/features/chapter(alshahat)/presentation/page/Chapters_Page.dart';
 import 'package:aner_astaner/features/organization/domain/entities/organization_item.dart';
 import 'package:aner_astaner/features/organization/presentation/controllers/organization_controller.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';

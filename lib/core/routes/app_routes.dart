@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../features/category/presentation/page/AddNewCatgory.dart';
-import '../../features/Churches/presentation/view/widgets/Add_churches_Box.dart';
+import '../../features/Churches/presentation/page/widgets/Add_churches_Box.dart';
 import '../../features/category/presentation/page/Category_Page.dart';
-import '../../features/chapter/presentation/view/Chapters_Page.dart';
-import '../../features/Churches/presentation/view/Churches_Page.dart';
+import '../../features/chapter(alshahat)/presentation/page/Chapters_Page.dart';
+import '../../features/Churches/presentation/page/Churches_Page.dart';
 import '../../features/home_page/presentation/page/Home_page.dart';
 import '../../features/Login/Completw_information_body.dart';
 import '../../features/Login/Inital_Login.dart';

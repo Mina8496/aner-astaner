@@ -1,4 +1,4 @@
-import '../../../../../../chapter/domain/entities/chapter_model.dart';
+import '../../../../../../chapter(alshahat)/domain/entities/chapter_model.dart';
 
 abstract interface class ExamChapterRepository {
   Stream<List<ChapterModel>> watchChapters({

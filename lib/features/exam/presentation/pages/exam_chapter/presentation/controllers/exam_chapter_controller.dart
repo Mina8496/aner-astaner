@@ -1,4 +1,4 @@
-import '../../../../../../chapter/domain/entities/chapter_model.dart';
+import '../../../../../../chapter(alshahat)/domain/entities/chapter_model.dart';
 import '../../data/repositories/firestore_exam_chapter_repository.dart';
 import '../../domain/repositories/exam_chapter_repository.dart';
 

@@ -1,4 +1,4 @@
-import 'package:aner_astaner/features/chapter/presentation/controllers/chapter_controller.dart';
+import 'package:aner_astaner/features/chapter(alshahat)/presentation/controllers/chapter_controller.dart';
 import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
 import 'package:flutter/material.dart';
