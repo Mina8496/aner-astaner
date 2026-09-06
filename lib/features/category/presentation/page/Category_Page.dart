@@ -1,4 +1,4 @@
-import 'package:aner_astaner/features/AlshahatPage/presentation/view/Alshahat_Page.dart';
+import 'package:aner_astaner/features/AlshahatPage/presentation/page/Alshahat_Page.dart';
 import 'package:aner_astaner/features/category/presentation/controllers/category_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
