@@ -6,7 +6,7 @@ import 'package:aner_astaner/features/organization/presentation/pages/widgets/or
 import 'package:aner_astaner/features/user/domain/entities/user_model.dart';
 import 'package:aner_astaner/features/user/domain/repositories/profile_image_uploader.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
-import 'package:aner_astaner/features/Churches/presentation/page/Churches_Page.dart';
+import 'package:aner_astaner/features/organization/presentation/pages/Churches_Page.dart';
 import 'package:aner_astaner/features/multiple_choice_quiz/presentation/page/Exames_Quiz_Page.dart';
 import 'package:aner_astaner/features/Login/Completw_information_body.dart';
 import 'package:aner_astaner/features/rewards_page/presentation/page/RewardsPage.dart';
