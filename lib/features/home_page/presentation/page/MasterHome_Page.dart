@@ -1,6 +1,6 @@
 
 import 'package:aner_astaner/features/user/presentation/pages/users_blocked_page/presentation/page/Disabled_Account_Page.dart';
-import 'package:aner_astaner/features/Login/Edit_User_Profile_Page.dart';
+import 'package:aner_astaner/features/Login/presentation/page/Edit_User_Profile_Page.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/UserPersonalResultsPage.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/BottomNavBar.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/MenuWidget.dart';
