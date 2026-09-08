@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:aner_astaner/features/rewards_page/domain/entities/reward.dart';
+import 'package:aner_astaner/features/rewards_page/domain/repositories/reward_repository.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -84,11 +85,7 @@ class _RewardsPageState extends State<RewardsPage> {
     String? finalUrl = oldImageUrl;
 
     if (docId != null) {
-      final snap = await FirebaseFirestore.instance
-          .collection("Rewards")
-          .doc(docId)
-          .get();
-      final data = snap.data();
+      final data = await Get.find<RewardRepository>().fetchRewardData(docId);
       if (data != null) {
         titleController.text = data['title'] ?? "";
         descController.text = data['description'] ?? "";
@@ -191,18 +188,15 @@ class _RewardsPageState extends State<RewardsPage> {
                       'description': descController.text.trim(),
                       'churchId': churchId,
                       'chapterId': chapterId,
-                      'createdAt': FieldValue.serverTimestamp(),
                     };
 
                     if (docId == null) {
-                      await FirebaseFirestore.instance
-                          .collection('Rewards')
-                          .add(data);
+                      await Get.find<RewardRepository>().addReward(data);
                     } else {
-                      await FirebaseFirestore.instance
-                          .collection('Rewards')
-                          .doc(docId)
-                          .update(data);
+                      await Get.find<RewardRepository>().updateReward(
+                        docId,
+                        data,
+                      );
                     }
 
                     if (mounted) Navigator.pop(context);
@@ -217,7 +211,8 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   Future<void> deleteReward(String docId) async {
-    await FirebaseFirestore.instance.collection('Rewards').doc(docId).delete();
+    await Get.find<RewardRepository>().deleteReward(docId);
+    if (!mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("🗑️ تم حذف الجائزة")));
@@ -235,19 +230,17 @@ class _RewardsPageState extends State<RewardsPage> {
           : null,
       body: _churchId == null || _chapterId == null
           ? const Center(child: CircularProgressIndicator())
-          : StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('Rewards')
-                  .where("churchId", isEqualTo: _churchId)
-                  .where("chapterId", isEqualTo: _chapterId)
-                  .orderBy("createdAt", descending: true)
-                  .snapshots(),
+          : StreamBuilder<List<Reward>>(
+              stream: Get.find<RewardRepository>().watchRewards(
+                churchId: _churchId!,
+                chapterId: _chapterId!,
+              ),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final rewards = snapshot.data!.docs;
+                final rewards = snapshot.data!;
 
                 if (rewards.isEmpty) {
                   return const Center(child: Text("لا توجد جوائز بعد 🎁"));
@@ -263,9 +256,8 @@ class _RewardsPageState extends State<RewardsPage> {
                   ),
                   itemCount: rewards.length,
                   itemBuilder: (context, index) {
-                    final reward =
-                        rewards[index].data() as Map<String, dynamic>;
-                    final docId = rewards[index].id;
+                    final reward = rewards[index];
+                    final docId = reward.id;
 
                     return Card(
                       elevation: 5,
@@ -281,7 +273,7 @@ class _RewardsPageState extends State<RewardsPage> {
                                 top: Radius.circular(16),
                               ),
                               child: Image.network(
-                                reward['imageUrl'],
+                                reward.imageUrl,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -292,7 +284,7 @@ class _RewardsPageState extends State<RewardsPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  reward['title'] ?? '',
+                                  reward.title,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -300,7 +292,7 @@ class _RewardsPageState extends State<RewardsPage> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  reward['description'] ?? '',
+                                  reward.description,
                                   style: const TextStyle(fontSize: 13),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -319,7 +311,7 @@ class _RewardsPageState extends State<RewardsPage> {
                                   ),
                                   onPressed: () => addOrEditReward(
                                     docId: docId,
-                                    oldImageUrl: reward['imageUrl'],
+                                    oldImageUrl: reward.imageUrl,
                                   ),
                                 ),
                                 IconButton(

@@ -1,14 +1,14 @@
-
 import 'package:aner_astaner/features/user/presentation/pages/users_blocked_page/presentation/page/Disabled_Account_Page.dart';
 import 'package:aner_astaner/features/Login/presentation/page/Edit_User_Profile_Page.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/UserPersonalResultsPage.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/BottomNavBar.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/MenuWidget.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/menuItem.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
+import 'package:get/get.dart';
 
 class MasterHome extends StatefulWidget {
   const MasterHome({super.key});
@@ -19,6 +19,7 @@ class MasterHome extends StatefulWidget {
 
 class _MasterHomeState extends State<MasterHome> {
   MenuItem currentItem = MenuItems.home;
+  final authService = Get.find<AuthService>();
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +72,7 @@ class _MasterHomeState extends State<MasterHome> {
               );
 
               if (shouldLogout == true) {
-                await FirebaseAuth.instance.signOut();
+                await authService.signOut();
                 if (context.mounted) {
                   Navigator.of(
                     context,
@@ -89,7 +90,7 @@ class _MasterHomeState extends State<MasterHome> {
   }
 
   Widget getScreen() {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final uid = authService.currentUser?.uid;
 
     switch (currentItem) {
       case MenuItems.home:
