@@ -22,6 +22,10 @@ import '../../features/organization/presentation/controllers/organization_contro
 import 'package:aner_astaner/features/app_update/data/repositories/firestore_app_update_repository.dart';
 import 'package:aner_astaner/features/app_update/domain/repositories/app_update_repository.dart';
 import '../../features/user/presentation/controllers/user_controller.dart';
+import 'package:aner_astaner/features/rewards_page/data/repositories/firestore_reward_repository.dart';
+import 'package:aner_astaner/features/rewards_page/domain/repositories/reward_repository.dart';
+import 'package:aner_astaner/features/multiple_choice_quiz/data/repositories/firestore_exam_quiz_repository.dart';
+import 'package:aner_astaner/features/multiple_choice_quiz/domain/repositories/exam_quiz_repository.dart';
 
 class AppBindings extends Bindings {
   @override
@@ -44,6 +48,8 @@ class AppBindings extends Bindings {
           ExamCatalogController(repository: Get.find<ExamCatalogRepository>()),
       fenix: true,
     );
+    Get.lazyPut<ExamQuizRepository>(FirestoreExamQuizRepository.new, fenix: true);
+    Get.lazyPut<RewardRepository>(FirestoreRewardRepository.new, fenix: true);
     Get.lazyPut<ExamSettingsController>(
       ExamSettingsController.new,
       fenix: true,

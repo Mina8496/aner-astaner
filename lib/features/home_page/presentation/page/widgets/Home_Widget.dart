@@ -8,7 +8,7 @@ import 'package:aner_astaner/features/user/domain/repositories/profile_image_upl
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:aner_astaner/features/organization/presentation/pages/Churches_Page.dart';
 import 'package:aner_astaner/features/multiple_choice_quiz/presentation/page/Exames_Quiz_Page.dart';
-import 'package:aner_astaner/features/Login/Completw_information_body.dart';
+import 'package:aner_astaner/features/Login/presentation/page/Completw_information_body.dart';
 import 'package:aner_astaner/features/rewards_page/presentation/page/RewardsPage.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/BibleReadButton.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/BubbleTopTailPainter.dart';

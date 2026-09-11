@@ -1,19 +1,18 @@
 // ignore_for_file: unnecessary_cast, non_constant_identifier_names
 import 'dart:async';
 import 'package:aner_astaner/features/audio/presentation/controllers/audio_controller.dart';
+import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
 import 'package:aner_astaner/features/exam/presentation/controllers/exam_controller.dart';
 import 'package:aner_astaner/core/constants/app_colors.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/MasterHome_Page.dart';
 import 'package:aner_astaner/core/widgets/ProgressTimer.dart';
 import 'package:aner_astaner/core/widgets/option_card.dart';
 import 'package:aner_astaner/core/widgets/result_Box.dart';
+import 'package:aner_astaner/features/multiple_choice_quiz/domain/repositories/exam_quiz_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'dart:math';
@@ -164,22 +163,19 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
   }
 
   Future<void> checkUserAccess() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final uid = Get.find<AuthService>().currentUser?.uid;
     if (uid == null) return;
 
-    // 1️⃣ تحقق من بيانات المستخدم
     final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
 
     final role = profile?.role ?? '';
-    final status = profile?.status ?? 'pending'; // 👈 نضيفها هنا
+    final status = profile?.status ?? 'pending';
 
-    // 2️⃣ لو المستخدم Admin أو DataAdmin يدخل عادي
     if (role == 'DataAdmin' || role == 'Admin' || role == 'SuperAdmin') {
       initQuiz();
       return;
     }
 
-    // 3️⃣ لو status مش "correct" نمنع الدخول
     if (status != "correct") {
       showDialog(
         context: context,
@@ -207,22 +203,17 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
       return;
     }
 
-    // 4️⃣ لو المستخدم عنده status = correct، نكمل التحقق من Approved
-    final approvedDoc = await FirebaseFirestore.instance
-        .collection("Churches")
-        .doc(widget.churchID)
-        .collection("Chapters")
-        .doc(widget.chapterID)
-        .collection("Approved")
-        .doc(uid)
-        .get();
+    final isApproved = await Get.find<ExamQuizRepository>().checkApproval(
+      churchId: widget.churchID,
+      chapterId: widget.chapterID,
+      uid: uid,
+    );
 
-    if (approvedDoc.exists) {
+    if (isApproved) {
       initQuiz();
       return;
     }
 
-    // 5️⃣ المستخدم مش في Approved
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -303,7 +294,7 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
   }
 
   Future<void> _handleExitBeforeFinish() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final uid = Get.find<AuthService>().currentUser?.uid;
     if (uid == null) return;
 
     final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
@@ -313,32 +304,29 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
     final userChurchID = profile?.churchId;
 
     final resultId = "${widget.alngelID}_${widget.alshahatID}";
-    final resultRef = FirebaseFirestore.instance
-        .collection("Exames")
-        .doc(uid)
-        .collection("Results")
-        .doc(resultId);
-
     final percentage = data.isEmpty ? 0 : ((score / data.length) * 100);
 
-    await resultRef.set({
-      'score': score,
-      'totalQuestions': data.length,
-      'percentage': percentage.toStringAsFixed(1),
-      'date': FieldValue.serverTimestamp(),
-      'alngelID': widget.alngelID,
-      'alshahatID': widget.alshahatID,
-      'bookTitle': bookTitle,
-      'chapterTitle': chapterTitle,
-      'full_name': full_name,
-      'Church': Church,
-      'userChurchID': userChurchID,
-      'examChurchID': widget.churchID,
-      'chapterID': widget.chapterID,
-      'userId': uid,
-      'attempts': 1,
-      'status': 'left_exam',
-    });
+    await Get.find<ExamQuizRepository>().saveResult(
+      uid: uid,
+      resultId: resultId,
+      data: {
+        'score': score,
+        'totalQuestions': data.length,
+        'percentage': percentage.toStringAsFixed(1),
+        'alngelID': widget.alngelID,
+        'alshahatID': widget.alshahatID,
+        'bookTitle': bookTitle,
+        'chapterTitle': chapterTitle,
+        'full_name': full_name,
+        'Church': Church,
+        'userChurchID': userChurchID,
+        'examChurchID': widget.churchID,
+        'chapterID': widget.chapterID,
+        'userId': uid,
+        'attempts': 1,
+        'status': 'left_exam',
+      },
+    );
 
     await backgroundPlayer.stop();
 
@@ -368,21 +356,17 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
 
   Future<void> fetchExamSettings() async {
     try {
-      final now = DateTime.now(); // 🕒 استخدم التوقيت المحلي
+      final now = DateTime.now();
       bool foundValidSettings = false;
 
-      final settingsCollection = await FirebaseFirestore.instance
-          .collection('Churches')
-          .doc(widget.churchID)
-          .collection('Chapters')
-          .doc(widget.chapterID)
-          .collection('Exames')
-          .doc(ExamesQuizPage.kFixedExameID)
-          .collection('Settings')
-          .get();
+      final settingsDocs = await Get.find<ExamQuizRepository>()
+          .fetchExamSettingsDocs(
+            churchId: widget.churchID,
+            chapterId: widget.chapterID,
+            examId: ExamesQuizPage.kFixedExameID,
+          );
 
-      for (var doc in settingsCollection.docs) {
-        final data = doc.data();
+      for (var data in settingsDocs) {
         final Timestamp? startTimestamp = data['examStart'] as Timestamp?;
         final Timestamp? endTimestamp = data['examEnd'] as Timestamp?;
 
@@ -390,16 +374,13 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
           final startDate = startTimestamp.toDate();
           final endDate = endTimestamp.toDate();
 
-          // 🧾 طباعة التواريخ للتأكد
           print("🔍 الآن: $now");
           print("📅 start: $startDate | end: $endDate");
 
-          // ✅ لو start == end، خليه مفتوح لنفس اليوم كامل
           final effectiveEnd = endDate.isAtSameMomentAs(startDate)
               ? endDate.add(const Duration(hours: 23, minutes: 59, seconds: 59))
               : endDate;
 
-          // ✅ الشرط النهائي لفحص صلاحية الامتحان
           if (now.isAfter(startDate) && now.isBefore(effectiveEnd)) {
             print("✅ تم العثور على إعداد امتحان صالح الآن");
 
@@ -409,14 +390,12 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
             bookTitle = data['bookTitle'] ?? 'غير محدد';
             chapterTitle = data['chapterTitle'] ?? 'غير محدد';
 
-            // ⏱️ قراءة زمن التايمر من الإعدادات
             int timerFromSettings = data['timerDuration'] ?? 40;
             maxSec = timerFromSettings;
             sec = RxInt(maxSec);
             print(
               "✅ تم تحميل إعدادات الامتحان: hasTimer=$hasTimer | maxSec=$maxSec",
             );
-
             print("⏱️ وقت السؤال من الإعدادات: $maxSec ثانية");
 
             foundValidSettings = true;
@@ -444,21 +423,15 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
   }
 
   Future<void> getQuestions() async {
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection("Churches")
-        .doc(widget.churchID)
-        .collection("Chapters")
-        .doc(widget.chapterID)
-        .collection("Exames")
-        .doc(ExamesQuizPage.kFixedExameID)
-        .collection("Alangel")
-        .doc(widget.alngelID)
-        .collection("Alshahat")
-        .doc(widget.alshahatID)
-        .collection("Qusstions")
-        .get();
+    final questions = await Get.find<ExamQuizRepository>().fetchQuestions(
+      churchId: widget.churchID,
+      chapterId: widget.chapterID,
+      examId: ExamesQuizPage.kFixedExameID,
+      alngelId: widget.alngelID,
+      alshahatId: widget.alshahatID,
+    );
 
-    data = querySnapshot.docs;
+    data = questions;
     print("✅ عدد الأسئلة المحملة: ${data.length}");
     for (var doc in data) {
       print("📄 سؤال: ${doc.data()}");
@@ -469,7 +442,7 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
   }
 
   Future<void> saveUserResult() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final uid = Get.find<AuthService>().currentUser?.uid;
     if (uid == null) return;
 
     final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
@@ -479,24 +452,18 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
     final userChurchID = profile?.churchId;
 
     final resultId = "${widget.alngelID}_${widget.alshahatID}";
-    final resultRef = FirebaseFirestore.instance
-        .collection("Exames")
-        .doc(uid)
-        .collection("Results")
-        .doc(resultId);
 
-    final snapshot = await resultRef.get();
+    final existingData = await Get.find<ExamQuizRepository>().fetchResultData(
+      uid: uid,
+      resultId: resultId,
+    );
 
-    // ⚡ استخدم null-aware operator للتأكد من وجود الحقل
-    int attempts = snapshot.exists
-        ? (snapshot.data()?['attempts'] as int? ?? 0)
-        : 0;
+    int attempts = existingData?['attempts'] as int? ?? 0;
 
     final resultData = {
       'score': score,
       'totalQuestions': data.length,
       'percentage': ((score / data.length) * 100).toStringAsFixed(1),
-      'date': FieldValue.serverTimestamp(),
       'alngelID': widget.alngelID,
       'alshahatID': widget.alshahatID,
       'bookTitle': bookTitle,
@@ -507,30 +474,29 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
       'examChurchID': widget.churchID,
       'chapterID': widget.chapterID,
       'userId': uid,
-      'attempts': attempts + 1, // ⬅️ نخزن عدد المحاولات
+      'attempts': attempts + 1,
     };
 
-    await resultRef.set(resultData);
+    await Get.find<ExamQuizRepository>().saveResult(
+      uid: uid,
+      resultId: resultId,
+      data: resultData,
+    );
     print("✅ Result saved with attempt ${attempts + 1}");
   }
 
   Future<bool> hasUserSubmittedBefore() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final uid = Get.find<AuthService>().currentUser?.uid;
     if (uid == null) return false;
 
     final resultId = "${widget.alngelID}_${widget.alshahatID}";
-    final docRef = FirebaseFirestore.instance
-        .collection('Exames')
-        .doc(uid)
-        .collection('Results')
-        .doc(resultId);
 
-    final snapshot = await docRef.get();
+    final resultData = await Get.find<ExamQuizRepository>().fetchResultData(
+      uid: uid,
+      resultId: resultId,
+    );
 
-    // ⚡ تحديد نوع الحقل صراحة
-    final attempts = snapshot.exists
-        ? (snapshot.data()?['attempts'] as int? ?? 0)
-        : 0;
+    final attempts = resultData?['attempts'] as int? ?? 0;
 
     if (isRepeatable) {
       return false;
