@@ -1,5 +1,5 @@
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/widgets/Add_Exames_Alngel_Box.dart';
-import 'package:aner_astaner/features/room_control/anagel_control/presentation/pages/alshahat/presentation/page/Exames_Alshahat_Page.dart';
+import 'package:aner_astaner/features/room_control/alshahat/presentation/page/Exames_Alshahat_Page.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/domain/entities/catalog_item.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
 import 'package:flutter/material.dart';
