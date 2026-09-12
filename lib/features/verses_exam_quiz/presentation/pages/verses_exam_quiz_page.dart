@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/audio/presentation/controllers/audio_controller.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/MasterHome_Page.dart';
 import 'package:aner_astaner/core/widgets/ProgressTimer.dart';
@@ -20,7 +21,6 @@ class VersesExamQuizPage extends StatefulWidget {
   final String? chapterID;
   final String? alngelID;
   final String? alshahatID;
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   const VersesExamQuizPage({
     super.key,
@@ -275,7 +275,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
           .collection("Chapters")
           .doc(widget.chapterID)
           .collection("Exames")
-          .doc(VersesExamQuizPage.kFixedExameID);
+          .doc(ExamConstants.fixedExamId);
 
       // get latest VersesSettings doc (by timestamp)
       final settingsQuery = await examDocRef

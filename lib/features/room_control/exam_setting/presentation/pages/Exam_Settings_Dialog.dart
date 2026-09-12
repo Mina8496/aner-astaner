@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_cast
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_model.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
@@ -23,8 +24,6 @@ class ExamSettingsDialog extends StatefulWidget {
     this.chapter,
     this.alngelId,
   });
-
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   @override
   State<ExamSettingsDialog> createState() => _ExamSettingsDialogState();
@@ -87,7 +86,7 @@ class _ExamSettingsDialogState extends State<ExamSettingsDialog> {
         .collection("Chapters")
         .doc(chapterId)
         .collection("Exames")
-        .doc(ExamSettingsDialog.kFixedExameID)
+        .doc(ExamConstants.fixedExamId)
         .collection("Alangel")
         .get();
 
@@ -109,7 +108,7 @@ class _ExamSettingsDialogState extends State<ExamSettingsDialog> {
         .collection("Chapters")
         .doc(chapterId)
         .collection("Exames")
-        .doc(ExamSettingsDialog.kFixedExameID)
+        .doc(ExamConstants.fixedExamId)
         .collection("Alangel")
         .doc(alngelId)
         .collection("Alshahat")
@@ -449,7 +448,7 @@ class _ExamSettingsDialogState extends State<ExamSettingsDialog> {
                   .collection("Chapters")
                   .doc(chapterId)
                   .collection("Exames")
-                  .doc(ExamSettingsDialog.kFixedExameID)
+                  .doc(ExamConstants.fixedExamId)
                   .collection("Settings")
                   .add(dataToSave);
 

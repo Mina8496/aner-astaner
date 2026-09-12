@@ -18,7 +18,6 @@ import 'package:aner_astaner/core/widgets/showHowTo_Qussyion_Dialog.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
 import 'package:aner_astaner/features/exam_settings/presentation/controllers/exam_settings_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -30,7 +29,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeWidget extends StatefulWidget {
   const HomeWidget({Key? key, this.alngelId}) : super(key: key);
   final String? alngelId;
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   @override
   State<HomeWidget> createState() => _HomeWidgetState();

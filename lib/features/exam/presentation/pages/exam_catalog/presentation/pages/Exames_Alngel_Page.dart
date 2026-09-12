@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class ExamesAlngelPage extends StatefulWidget {
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   const ExamesAlngelPage({Key? key, this.ChurchID, this.ChapterID})
     : super(key: key);

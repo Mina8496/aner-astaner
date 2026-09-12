@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AyatQuizAdminPage extends StatelessWidget {
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
   final String? churchID;
   final String? chapterID;
 

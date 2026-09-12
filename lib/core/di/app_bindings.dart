@@ -2,7 +2,7 @@ import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/data/
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/domain/repositories/exam_catalog_repository.dart';
 import 'package:aner_astaner/features/organization/data/repositories/firestore_organization_repository.dart';
 import 'package:aner_astaner/features/organization/domain/repositories/organization_repository.dart';
-import 'package:aner_astaner/features/show_all_users_results_page/data/repositories/firestore_results_repository.dart';
+import 'package:aner_astaner/features/show_all_users_results_page/data/repo/firestore_results_repository.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/domain/repositories/results_repository.dart';
 import 'package:aner_astaner/features/user/data/repositories/firestore_user_repository.dart';
 import 'package:aner_astaner/features/user/data/services/profile_image_service.dart';

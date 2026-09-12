@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:aner_astaner/features/exam_settings/domain/entities/exam_setting.dart';
@@ -215,7 +216,7 @@ class _AllExamsPageState extends State<AllExamsPage> {
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     tooltip: "حذف الامتحان",
                     onPressed: () =>
-                        deleteExam(context, 'nFL11C4v8fPRqIgG0ZAe', exam.id),
+                        deleteExam(context, ExamConstants.fixedExamId, exam.id),
                   ),
                 ),
               );

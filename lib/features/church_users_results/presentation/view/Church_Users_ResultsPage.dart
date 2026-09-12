@@ -1,7 +1,6 @@
 // ignore_for_file: unused_element
 
-import 'package:aner_astaner/features/multiple_choice_quiz/presentation/page/Exames_Quiz_Page.dart';
-import 'package:aner_astaner/features/verses_exam_quiz/presentation/pages/verses_exam_quiz_page.dart';
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/Login/presentation/page/Edit_User_Page.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -77,7 +76,7 @@ class _ChurchUsersResultsPageState extends State<ChurchUsersResultsPage>
         .collection("Chapters")
         .doc(chapterId)
         .collection("Exames")
-        .doc(ExamesQuizPage.kFixedExameID)
+        .doc(ExamConstants.fixedExamId)
         .collection("Settings")
         .orderBy("timestamp", descending: true)
         .limit(1)
@@ -98,7 +97,7 @@ class _ChurchUsersResultsPageState extends State<ChurchUsersResultsPage>
         .collection("Chapters")
         .doc(chapterId)
         .collection("Exames")
-        .doc(VersesExamQuizPage.kFixedExameID)
+        .doc(ExamConstants.fixedExamId)
         .collection("VersesSettings")
         .orderBy("timestamp", descending: true)
         .limit(1)

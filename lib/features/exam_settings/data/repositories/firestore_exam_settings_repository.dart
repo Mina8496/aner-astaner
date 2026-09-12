@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -24,7 +25,7 @@ class FirestoreExamSettingsRepository implements ExamSettingsRepository {
       .collection('Chapters')
       .doc(chapterId)
       .collection('Exames')
-      .doc('nFL11C4v8fPRqIgG0ZAe')
+      .doc(ExamConstants.fixedExamId)
       .collection('Settings');
 
   @override

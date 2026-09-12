@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_cast, non_constant_identifier_names
 import 'dart:async';
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/audio/presentation/controllers/audio_controller.dart';
 import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
 import 'package:aner_astaner/features/exam/presentation/controllers/exam_controller.dart';
@@ -26,7 +27,6 @@ class ExamesQuizPage extends StatefulWidget {
   // final bool hasTimer;
   // final bool isRepeatable;
 
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
   static Map<String, QueryDocumentSnapshot> dataToApp = {};
 
   const ExamesQuizPage({
@@ -363,7 +363,7 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
           .fetchExamSettingsDocs(
             churchId: widget.churchID,
             chapterId: widget.chapterID,
-            examId: ExamesQuizPage.kFixedExameID,
+            examId: ExamConstants.fixedExamId,
           );
 
       for (var data in settingsDocs) {
@@ -426,7 +426,7 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
     final questions = await Get.find<ExamQuizRepository>().fetchQuestions(
       churchId: widget.churchID,
       chapterId: widget.chapterID,
-      examId: ExamesQuizPage.kFixedExameID,
+      examId: ExamConstants.fixedExamId,
       alngelId: widget.alngelID,
       alshahatId: widget.alshahatID,
     );

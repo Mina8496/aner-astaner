@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../../../chapter(alshahat)/domain/entities/chapter_model.dart';
@@ -7,7 +8,6 @@ class FirestoreExamChapterRepository implements ExamChapterRepository {
   FirestoreExamChapterRepository({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  static const examId = 'nFL11C4v8fPRqIgG0ZAe';
   final FirebaseFirestore _firestore;
 
   CollectionReference<Map<String, dynamic>>? _chapters({
@@ -25,7 +25,7 @@ class FirestoreExamChapterRepository implements ExamChapterRepository {
         .collection('Chapters')
         .doc(chapterId)
         .collection('Exames')
-        .doc(examId)
+        .doc(ExamConstants.fixedExamId)
         .collection('Alangel')
         .doc(categoryId)
         .collection('Alshahat');

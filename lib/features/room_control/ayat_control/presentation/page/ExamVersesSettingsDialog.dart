@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,7 +9,6 @@ import 'package:get/get.dart';
 class ExamVersesSettingsDialog extends StatefulWidget {
   const ExamVersesSettingsDialog({super.key});
 
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   @override
   State<ExamVersesSettingsDialog> createState() =>
@@ -65,7 +65,7 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
         .collection("Chapters")
         .doc(chapterId)
         .collection("Exames")
-        .doc(ExamVersesSettingsDialog.kFixedExameID)
+        .doc(ExamConstants.fixedExamId)
         .collection("AyatQuiz")
         .get();
 
@@ -369,7 +369,7 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
           .collection("Chapters")
           .doc(chapterId)
           .collection("Exames")
-          .doc(ExamVersesSettingsDialog.kFixedExameID)
+          .doc(ExamConstants.fixedExamId)
           .collection("VersesSettings")
           .add(dataToSave);
 

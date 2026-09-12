@@ -13,7 +13,6 @@ class ExamesQuestionsPage extends StatefulWidget {
     this.AlshahatID,
   }) : super(key: key);
 
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
   final String? ChurchID;
   final String? ChapterID;
   final String? AlngelID;
