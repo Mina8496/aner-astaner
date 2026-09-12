@@ -28,6 +28,10 @@ abstract interface class UserRepository {
 
   Future<Map<String, dynamic>?> fetchUserById(String userId);
 
+   Future<Map<String, Map<String, dynamic>>> fetchUsersByIds(
+    List<String> userIds,
+  );
+
   Future<Map<String, dynamic>?> fetchCurrentUserData();
 
   Future<void> updateCurrentUser(Map<String, dynamic> data);
