@@ -11,7 +11,7 @@ class UserController {
   final UserRepository _repository;
 
   Future<UserProfile?> fetchCurrentUserProfile() =>
-    _repository.fetchCurrentUserProfile();
+      _repository.fetchCurrentUserProfile();
 
   Stream<List<UserSummary>> watchUsersByOrganization({
     required String churchId,
@@ -44,9 +44,9 @@ class UserController {
   Future<UserModel?> fetchUserData() => _repository.fetchCurrentUser();
 
   Future<UserModel?> fetchUserById(String userId) =>
-    _repository.fetchUserById(userId);
+      _repository.fetchUserById(userId);
 
-  Future<Map<String, dynamic>?> fetchCurrentUserData() =>
+  Future<UserModel?> fetchCurrentUserData() =>
       _repository.fetchCurrentUserData();
 
   Future<void> updateCurrentUser(Map<String, dynamic> data) =>

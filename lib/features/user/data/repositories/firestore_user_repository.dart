@@ -15,12 +15,6 @@ class FirestoreUserRepository implements UserRepository {
   final FirebaseFirestore _firestore;
 
   @override
-  Future<UserProfile?> fetchCurrentUserProfile() async {
-    final data = await fetchCurrentUserData();
-    return data != null ? UserProfile.fromMap(data) : null;
-  }
-
-  @override
   Stream<List<UserSummary>> watchUsersByOrganization({
     required String churchId,
     required String chapterId,
@@ -158,12 +152,27 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> fetchCurrentUserData() async {
+  Future<UserModel?> fetchCurrentUserData() async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
 
     final document = await _firestore.collection('users').doc(uid).get();
-    return document.exists ? document.data() : null;
+    final data = document.data();
+    if (!document.exists || data == null) return null;
+
+    return UserModel.fromMap(document.id, data);
+  }
+
+  @override
+  Future<UserProfile?> fetchCurrentUserProfile() async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null) return null;
+
+    final document = await _firestore.collection('users').doc(uid).get();
+    final data = document.data();
+    if (!document.exists || data == null) return null;
+
+    return UserProfile.fromMap(data);
   }
 
   @override
