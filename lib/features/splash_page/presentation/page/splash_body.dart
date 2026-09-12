@@ -1,6 +1,7 @@
 import 'package:aner_astaner/core/services/force_update_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SplashViewBody extends StatefulWidget {
   const SplashViewBody({super.key});
@@ -68,7 +69,7 @@ class _SplashViewBodyState extends State<SplashViewBody>
   void goToNextView() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: 1), () {
-        final user = FirebaseAuth.instance.currentUser;
+        final user = Get.find<AuthService>().currentUser;
         final isVerified = user?.emailVerified ?? false;
 
         Navigator.of(context).pushReplacementNamed(
