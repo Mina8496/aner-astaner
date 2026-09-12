@@ -48,7 +48,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
 
   // UI / state
   bool showAnimation = false;
-  String feedbackGif = "assets/carcter/pen_search.png";
+  String feedbackGif = "assets/carcter/pen_search.gif";
   bool? wasLastAnswerCorrect;
   String feedbackText = '';
   bool showFeedbackText = false;
@@ -60,6 +60,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
   double timerDuration = 30; // from settings (seconds)
   int index = 0;
   int scoreAyat = 0;
+  String? _activeVersesSettingsId;
 
   // timer
   Timer? _timer;
@@ -292,6 +293,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
       }
 
       final settings = settingsQuery.docs.first.data();
+      _activeVersesSettingsId = settingsQuery.docs.first.id;
       // read settings
       durationDays = (settings['durationDays'] ?? 1) as int;
       hasTimer = (settings['hasTimer'] ?? false) as bool;
@@ -535,6 +537,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
       'ChurchID': profile?.churchId,
       'chapterID': widget.chapterID,
       'examChurchID': widget.churchID,
+      'versesSettingsId': _activeVersesSettingsId,
       'date': FieldValue.serverTimestamp(),
     };
 
