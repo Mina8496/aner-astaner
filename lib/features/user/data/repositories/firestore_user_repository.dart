@@ -150,9 +150,11 @@ class FirestoreUserRepository implements UserRepository {
   }
 
   @override
-  Future<Map<String, dynamic>?> fetchUserById(String userId) async {
+  Future<UserModel?> fetchUserById(String userId) async {
     final document = await _firestore.collection('users').doc(userId).get();
-    return document.exists ? document.data() : null;
+    final data = document.data();
+    if (!document.exists || data == null) return null;
+    return UserModel.fromMap(document.id, data);
   }
 
   @override

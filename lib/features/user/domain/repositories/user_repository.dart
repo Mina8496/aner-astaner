@@ -26,7 +26,7 @@ abstract interface class UserRepository {
 
   Future<UserModel?> fetchCurrentUser();
 
-  Future<Map<String, dynamic>?> fetchUserById(String userId);
+  Future<UserModel?> fetchUserById(String userId);
 
    Future<Map<String, Map<String, dynamic>>> fetchUsersByIds(
     List<String> userIds,

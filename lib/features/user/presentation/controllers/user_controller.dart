@@ -43,8 +43,8 @@ class UserController {
 
   Future<UserModel?> fetchUserData() => _repository.fetchCurrentUser();
 
-  Future<Map<String, dynamic>?> fetchUserById(String userId) =>
-      _repository.fetchUserById(userId);
+  Future<UserModel?> fetchUserById(String userId) =>
+    _repository.fetchUserById(userId);
 
   Future<Map<String, dynamic>?> fetchCurrentUserData() =>
       _repository.fetchCurrentUserData();
