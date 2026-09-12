@@ -15,10 +15,10 @@ class FirestoreUserRepository implements UserRepository {
   final FirebaseFirestore _firestore;
 
   @override
-Future<UserProfile?> fetchCurrentUserProfile() async {
-  final data = await fetchCurrentUserData();
-  return data != null ? UserProfile.fromMap(data) : null;
-}
+  Future<UserProfile?> fetchCurrentUserProfile() async {
+    final data = await fetchCurrentUserData();
+    return data != null ? UserProfile.fromMap(data) : null;
+  }
 
   @override
   Stream<List<UserSummary>> watchUsersByOrganization({
@@ -108,6 +108,34 @@ Future<UserProfile?> fetchCurrentUserProfile() async {
   @override
   Future<void> enableUser(String userId) =>
       _firestore.collection('users').doc(userId).update({'disabled': false});
+
+  @override
+  Future<Map<String, Map<String, dynamic>>> fetchUsersByIds(
+    List<String> userIds,
+  ) async {
+    final usersCollection = FirebaseFirestore.instance.collection("users");
+
+    final chunks = <List<String>>[];
+    for (var i = 0; i < userIds.length; i += 10) {
+      chunks.add(
+        userIds.sublist(i, i + 10 > userIds.length ? userIds.length : i + 10),
+      );
+    }
+
+    final futures = chunks.map((chunk) {
+      return usersCollection.where(FieldPath.documentId, whereIn: chunk).get();
+    });
+
+    final snapshots = await Future.wait(futures);
+
+    final Map<String, Map<String, dynamic>> usersMap = {};
+    for (var snap in snapshots) {
+      for (var doc in snap.docs) {
+        usersMap[doc.id] = doc.data();
+      }
+    }
+    return usersMap;
+  }
 
   @override
   Future<UserModel?> fetchCurrentUser() async {
