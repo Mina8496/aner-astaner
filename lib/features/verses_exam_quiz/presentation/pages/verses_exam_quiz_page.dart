@@ -48,7 +48,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
 
   // UI / state
   bool showAnimation = false;
-  String feedbackGif = "assets/carcter/pen_search.png";
+  String feedbackGif = "assets/carcter/pen_search.gif";
   bool? wasLastAnswerCorrect;
   String feedbackText = '';
   bool showFeedbackText = false;
