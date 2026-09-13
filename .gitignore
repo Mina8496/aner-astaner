@@ -5,6 +5,7 @@ build/
 .pub-cache/
 .pub/
 coverage/
+.vscode/launch.json
 
 # Android
 android/.gradle/
