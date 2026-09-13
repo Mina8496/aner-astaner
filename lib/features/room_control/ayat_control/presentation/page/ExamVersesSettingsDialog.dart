@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 class ExamVersesSettingsDialog extends StatefulWidget {
   const ExamVersesSettingsDialog({super.key});
 
-
   @override
   State<ExamVersesSettingsDialog> createState() =>
       _ExamVersesSettingsDialogState();
@@ -327,15 +326,18 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
   Future<void> saveSettings() async {
     if (selectedVerses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("يجب اختيار آية واحدة على الأقل")),
+        SnackBar(
+          key: UniqueKey(),
+          content: const Text("يجب اختيار آية واحدة على الأقل"),
+        ),
       );
       return;
     }
 
     if (examStartDate == null || examEndDate == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("يجب تحديد التواريخ")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(key: UniqueKey(), content: const Text("يجب تحديد التواريخ")),
+      );
       return;
     }
 
@@ -374,13 +376,16 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
           .add(dataToSave);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("تم حفظ إعدادات امتحان الآيات ✅")),
+        SnackBar(
+          key: UniqueKey(),
+          content: const Text("تم حفظ إعدادات امتحان الآيات ✅"),
+        ),
       );
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("خطأ أثناء الحفظ: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(key: UniqueKey(), content: Text("خطأ أثناء الحفظ: $e")),
+      );
     }
   }
 }

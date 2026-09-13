@@ -91,6 +91,7 @@ flutter:
     - assets/audio/Q_music_back.mp3
     - assets/audio/wrong.mp3
     - assets/audio/correct.mp3
+    - assets/audio/warning.mp3
     - assets/carcter/correct.png
     - assets/carcter/wrong.png
     - assets/carcter/
