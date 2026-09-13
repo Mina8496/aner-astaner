@@ -152,20 +152,6 @@ class _RigesterViewState extends State<RigesterView> {
                         );
 
                         try {
-                          List<String> methods = await FirebaseAuth.instance
-                              .fetchSignInMethodsForEmail(newEmail.text.trim());
-
-                          if (methods.isNotEmpty) {
-                            _dismissLoading();
-                            await _showMessage(
-                              title: "الإيميل مستخدم بالفعل",
-                              message: methods.contains('google.com')
-                                  ? 'الإيميل مرتبط بجوجل، سجل باستخدامه.'
-                                  : 'الإيميل مسجل مسبقًا، قم بتسجيل الدخول.',
-                            );
-                            return;
-                          }
-
                           final user = await authService.registerWithEmail(
                             newEmail.text.trim(),
                             newPassword.text.trim(),
@@ -192,6 +178,9 @@ class _RigesterViewState extends State<RigesterView> {
                           if (e.code == 'weak-password') {
                             message =
                                 'كلمة المرور ضعيفة جدًا. اختر كلمة مرور أقوى.';
+                          } else if (e.code == 'email-already-in-use') {
+                            message =
+                                'الإيميل مسجل مسبقًا، من فضلك سجّل الدخول.';
                           } else {
                             message = e.message ?? 'حدث خطأ أثناء التسجيل.';
                           }

@@ -119,6 +119,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
       // we only set asset when we need to play; just prepare background
       await player.setAsset('assets/audio/correct.mp3');
       await backgroundPlayer.setAsset('assets/audio/Q_music_back.mp3');
+      await backgroundPlayer.setVolume(0.4);
       await backgroundPlayer.setLoopMode(LoopMode.one);
     } catch (e) {
       debugPrint("Audio prepare error: $e");

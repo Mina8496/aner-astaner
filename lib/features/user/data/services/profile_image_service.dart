@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:aner_astaner/core/config/imgbb_config.dart';
 import 'package:http/http.dart' as http;
 
 import '../../domain/repositories/profile_image_uploader.dart';
 
 class ProfileImageService implements ProfileImageUploader {
-  static const _apiKey = '617c18f7c03af1e2bba0fec00c6f96ab';
-
   @override
   Future<String?> upload(Uint8List bytes) async {
     final response = await http.post(
-      Uri.parse('https://api.imgbb.com/1/upload?key=$_apiKey'),
+      Uri.parse('https://api.imgbb.com/1/upload?key=${ImgbbConfig.apiKey}'),
       body: {'image': base64Encode(bytes), 'name': 'flutter_uploaded_image'},
     );
 

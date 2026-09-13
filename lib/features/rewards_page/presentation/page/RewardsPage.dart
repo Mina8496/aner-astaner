@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:aner_astaner/core/config/imgbb_config.dart';
 import 'package:aner_astaner/features/rewards_page/domain/entities/reward.dart';
 import 'package:aner_astaner/features/rewards_page/domain/repositories/reward_repository.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
@@ -57,11 +58,10 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   Future<String?> uploadImage(Uint8List bytes) async {
-    const apiKey = '617c18f7c03af1e2bba0fec00c6f96ab';
     final base64Image = base64Encode(bytes);
 
     final response = await http.post(
-      Uri.parse('https://api.imgbb.com/1/upload?key=$apiKey'),
+      Uri.parse('https://api.imgbb.com/1/upload?key=${ImgbbConfig.apiKey}'),
       body: {'image': base64Image, 'name': 'reward_image'},
     );
 

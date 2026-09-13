@@ -145,6 +145,7 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
       await correctPlayer.setAsset('assets/audio/correct.mp3');
       await wrongPlayer.setAsset('assets/audio/wrong.mp3');
       await warningPlayer.setAsset('assets/audio/warning.mp3');
+      await warningPlayer.setVolume(1.0);
       await backgroundPlayer.setAsset('assets/audio/Q_music_back.mp3');
       await backgroundPlayer.setLoopMode(LoopMode.one);
     } catch (e) {
@@ -155,6 +156,7 @@ class _ExamesQuizPageState extends State<ExamesQuizPage>
   Future<void> playBackgroundMusic() async {
     try {
       await backgroundPlayer.setAsset('assets/audio/Q_music_back.mp3');
+      await backgroundPlayer.setVolume(0.4);
       await backgroundPlayer.setLoopMode(LoopMode.one);
       await backgroundPlayer.play();
     } catch (e) {
