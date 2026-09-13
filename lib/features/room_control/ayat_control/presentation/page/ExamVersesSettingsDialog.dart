@@ -18,6 +18,7 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
   bool isRepeatable = false;
   bool hasTimer = false;
   bool isLoading = true;
+  bool isSaving = false;
 
   String? churchId;
   String? chapterId;
@@ -127,8 +128,16 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
               ),
               actions: [
                 TextButton(
-                  child: const Text("تم"),
-                  onPressed: () => Navigator.pop(ctx),
+                  onPressed: isSaving ? null : saveSettings,
+                  child: isSaving
+                      ? SizedBox(
+                          width: 16.w,
+                          height: 16.w,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text("تم"),
                 ),
               ],
             );
@@ -328,7 +337,7 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           key: UniqueKey(),
-          content: const Text("يجب اختيار آية واحدة على الأقل"),
+          content: Text("يجب اختيار آية واحدة على الأقل"),
         ),
       );
       return;
@@ -336,13 +345,15 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
 
     if (examStartDate == null || examEndDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(key: UniqueKey(), content: const Text("يجب تحديد التواريخ")),
+        SnackBar(key: UniqueKey(), content: Text("يجب تحديد التواريخ")),
       );
       return;
     }
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
+
+    setState(() => isSaving = true);
 
     final selectedTitles = versesList
         .where((v) => selectedVerses.contains(v["id"]))
@@ -375,14 +386,17 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
           .collection("VersesSettings")
           .add(dataToSave);
 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           key: UniqueKey(),
-          content: const Text("تم حفظ إعدادات امتحان الآيات ✅"),
+          content: Text("تم حفظ إعدادات امتحان الآيات ✅"),
         ),
       );
       Navigator.pop(context);
     } catch (e) {
+      if (!mounted) return;
+      setState(() => isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(key: UniqueKey(), content: Text("خطأ أثناء الحفظ: $e")),
       );
