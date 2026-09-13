@@ -25,13 +25,14 @@ class _RoomPageState extends State<RoomPage> {
   bool isSuperAdmin = false;
 
   Future<void> checkIfSuperAdmin() async {
-  final profile = await Get.find<UserController>().fetchCurrentUserProfile();
-  if (profile != null) {
-    setState(() {
-      isSuperAdmin = profile.role == 'SuperAdmin';
-    });
+    final profile = await Get.find<UserController>().fetchCurrentUserProfile();
+    if (!mounted) return;
+    if (profile != null) {
+      setState(() {
+        isSuperAdmin = profile.role == 'SuperAdmin';
+      });
+    }
   }
-}
 
   @override
   void initState() {
