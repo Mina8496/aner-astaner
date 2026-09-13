@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/question_model.dart';
@@ -7,7 +8,6 @@ class FirestoreQuestionRepository implements QuestionRepository {
   FirestoreQuestionRepository({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  static const examId = 'nFL11C4v8fPRqIgG0ZAe';
   final FirebaseFirestore _firestore;
 
   CollectionReference<Map<String, dynamic>>? _questions({
@@ -26,7 +26,7 @@ class FirestoreQuestionRepository implements QuestionRepository {
         .collection('Chapters')
         .doc(chapterId)
         .collection('Exames')
-        .doc(examId)
+        .doc(ExamConstants.fixedExamId)
         .collection('Alangel')
         .doc(categoryId)
         .collection('Alshahat')

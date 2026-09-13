@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class ExamesAlshahatPage extends StatefulWidget {
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   const ExamesAlshahatPage({
     Key? key,
@@ -17,7 +16,6 @@ class ExamesAlshahatPage extends StatefulWidget {
   final String? ChurchID;
   final String? ChapterID;
   final String? AlngelID;
-  // final String ExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   @override
   State<ExamesAlshahatPage> createState() => _ExamesAlshahatPageState();

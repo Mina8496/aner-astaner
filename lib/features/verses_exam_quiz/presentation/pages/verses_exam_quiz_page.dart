@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/audio/presentation/controllers/audio_controller.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/MasterHome_Page.dart';
 import 'package:aner_astaner/core/widgets/ProgressTimer.dart';
@@ -20,7 +21,6 @@ class VersesExamQuizPage extends StatefulWidget {
   final String? chapterID;
   final String? alngelID;
   final String? alshahatID;
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
 
   const VersesExamQuizPage({
     super.key,
@@ -48,7 +48,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
 
   // UI / state
   bool showAnimation = false;
-  String feedbackGif = "assets/carcter/pen_search.png";
+  String feedbackGif = "assets/carcter/pen_search.gif";
   bool? wasLastAnswerCorrect;
   String feedbackText = '';
   bool showFeedbackText = false;
@@ -60,6 +60,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
   double timerDuration = 30; // from settings (seconds)
   int index = 0;
   int scoreAyat = 0;
+  String? _activeVersesSettingsId;
 
   // timer
   Timer? _timer;
@@ -274,7 +275,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
           .collection("Chapters")
           .doc(widget.chapterID)
           .collection("Exames")
-          .doc(VersesExamQuizPage.kFixedExameID);
+          .doc(ExamConstants.fixedExamId);
 
       // get latest VersesSettings doc (by timestamp)
       final settingsQuery = await examDocRef
@@ -292,6 +293,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
       }
 
       final settings = settingsQuery.docs.first.data();
+      _activeVersesSettingsId = settingsQuery.docs.first.id;
       // read settings
       durationDays = (settings['durationDays'] ?? 1) as int;
       hasTimer = (settings['hasTimer'] ?? false) as bool;
@@ -535,6 +537,7 @@ class _VersesExamQuizPageState extends State<VersesExamQuizPage>
       'ChurchID': profile?.churchId,
       'chapterID': widget.chapterID,
       'examChurchID': widget.churchID,
+      'versesSettingsId': _activeVersesSettingsId,
       'date': FieldValue.serverTimestamp(),
     };
 

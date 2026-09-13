@@ -1,7 +1,9 @@
+import 'package:aner_astaner/features/show_all_users_results_page/domain/repositories/results_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class UserPersonalResultsPage extends StatefulWidget {
@@ -53,19 +55,16 @@ class _UserPersonalResultsPageState extends State<UserPersonalResultsPage> {
           SizedBox(height: 8.h),
           _buildFilterRow(),
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('Exames')
-                  .doc(widget.userId)
-                  .collection('Results')
-                  .orderBy('date', descending: true)
-                  .snapshots(),
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: Get.find<ResultsRepository>().watchUserResults(
+                widget.userId,
+              ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text(
                       'لا توجد نتائج بعد',
@@ -74,8 +73,7 @@ class _UserPersonalResultsPageState extends State<UserPersonalResultsPage> {
                   );
                 }
 
-                final results = snapshot.data!.docs.where((doc) {
-                  final data = doc.data() as Map<String, dynamic>;
+                final results = snapshot.data!.where((data) {
                   final ts = data['date'] as Timestamp?;
                   if (ts == null) return false;
                   final date = ts.toDate();
@@ -95,7 +93,7 @@ class _UserPersonalResultsPageState extends State<UserPersonalResultsPage> {
                   padding: EdgeInsets.all(16.w),
                   itemCount: results.length,
                   itemBuilder: (context, index) {
-                    final data = results[index].data() as Map<String, dynamic>;
+                    final data = results[index];
                     final date = (data['date'] as Timestamp).toDate();
                     final formattedDate = DateFormat(
                       'yyyy/MM/dd – HH:mm',

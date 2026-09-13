@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/catalog_item.dart';
@@ -7,7 +8,6 @@ class FirestoreExamCatalogRepository implements ExamCatalogRepository {
   FirestoreExamCatalogRepository({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  static const examId = 'nFL11C4v8fPRqIgG0ZAe';
   final FirebaseFirestore _firestore;
 
   @override
@@ -33,7 +33,7 @@ class FirestoreExamCatalogRepository implements ExamCatalogRepository {
         .collection('Chapters')
         .doc(chapterId)
         .collection('Exames')
-        .doc(examId)
+        .doc(ExamConstants.fixedExamId)
         .collection('Alangel')
         .get();
     return _items(snapshot, (data) => data['title']);
@@ -51,7 +51,7 @@ class FirestoreExamCatalogRepository implements ExamCatalogRepository {
         .collection('Chapters')
         .doc(chapterId)
         .collection('Exames')
-        .doc(examId)
+        .doc(ExamConstants.fixedExamId)
         .collection('Alangel')
         .doc(categoryId)
         .collection('Alshahat')
@@ -82,7 +82,7 @@ class FirestoreExamCatalogRepository implements ExamCatalogRepository {
       .collection('Chapters')
       .doc(chapterId)
       .collection('Exames')
-      .doc(examId)
+      .doc(ExamConstants.fixedExamId)
       .collection('Alangel');
 
   @override

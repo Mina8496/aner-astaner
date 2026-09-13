@@ -1,12 +1,11 @@
 import 'dart:async';
+import 'package:aner_astaner/features/show_all_users_results_page/domain/repositories/results_repository.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart' hide Rx;
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdart/rxdart.dart';
 
 class AllUsersResultsPage extends StatefulWidget {
   const AllUsersResultsPage({super.key});
@@ -16,6 +15,8 @@ class AllUsersResultsPage extends StatefulWidget {
 }
 
 class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
+  final ResultsRepository resultsRepo = Get.find<ResultsRepository>();
+
   String selectedTimeFilter = 'الكل';
   String? selectedBookTitle;
   List<String> timeFilters = ['الكل', 'اليوم', 'الأسبوع', 'الشهر', 'السنة'];
@@ -35,16 +36,12 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
   }
 
   void listenToPageStatus() {
-    _pageStatusSub = FirebaseFirestore.instance
-        .collection("settings")
-        .doc("resultsPage")
-        .snapshots()
-        .listen((doc) {
-          if (!mounted) return;
-          setState(() {
-            pageEnabled = doc.data()?['enabled'] ?? true;
-          });
-        });
+    _pageStatusSub = resultsRepo.watchResultsPageEnabled().listen((enabled) {
+      if (!mounted) return;
+      setState(() {
+        pageEnabled = enabled;
+      });
+    });
   }
 
   Future<void> fetchCurrentUserRole() async {
@@ -56,21 +53,10 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
   }
 
   Future<void> fetchBookTitles() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collectionGroup("Results")
-        .get();
-
-    final titles = <String>{};
-    for (var doc in snapshot.docs) {
-      final data = doc.data();
-      if (data['bookTitle'] is String) {
-        titles.add(data['bookTitle']);
-      }
-    }
-
+    final titles = await resultsRepo.fetchDistinctBookTitles();
     if (!mounted) return;
     setState(() {
-      bookTitles = titles.toList();
+      bookTitles = titles;
     });
   }
 
@@ -93,113 +79,12 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
     }
   }
 
-  Future<Map<String, Map<String, dynamic>>> fetchUsers(
-    List<String> userIds,
-  ) async {
-    final usersCollection = FirebaseFirestore.instance.collection("users");
-
-    final chunks = <List<String>>[];
-    for (var i = 0; i < userIds.length; i += 10) {
-      chunks.add(
-        userIds.sublist(i, i + 10 > userIds.length ? userIds.length : i + 10),
-      );
-    }
-
-    final futures = chunks.map((chunk) {
-      return usersCollection.where(FieldPath.documentId, whereIn: chunk).get();
-    });
-
-    final snapshots = await Future.wait(futures);
-
-    final Map<String, Map<String, dynamic>> usersMap = {};
-    for (var snap in snapshots) {
-      for (var doc in snap.docs) {
-        usersMap[doc.id] = doc.data();
-      }
-    }
-    return usersMap;
+  Future<Map<String, Map<String, dynamic>>> fetchUsers(List<String> userIds) {
+    return Get.find<UserRepository>().fetchUsersByIds(userIds);
   }
 
   Stream<List<Map<String, dynamic>>> getCombinedResults() {
-    final resultsStream = FirebaseFirestore.instance
-        .collectionGroup("Results")
-        .snapshots()
-        .map(
-          (snap) => snap.docs.map((d) {
-            final data = d.data();
-            return {
-              "userId": data['userId'],
-              "full_name": data['full_name'] ?? "مستخدم",
-              "percentage":
-                  double.tryParse(data['percentage']?.toString() ?? "0") ?? 0,
-              "score": data['score'] ?? 0,
-              "total": data['totalQuestions'] ?? 0,
-              "bookTitle": data['bookTitle'] ?? "",
-              "chapterTitle": data['chapterTitle'] ?? "",
-              "timestamp":
-                  (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
-              "scoreAyat": null,
-              "totalQuestionsAyat": null,
-            };
-          }).toList(),
-        );
-
-    final ayatStream = FirebaseFirestore.instance
-        .collection("ExamesAyat")
-        .snapshots()
-        .map(
-          (snap) => snap.docs.map((d) {
-            final data = d.data();
-            return {
-              "userId": data['userId'],
-              "full_name": data['full_name'] ?? "مستخدم",
-              "percentage": 0.0,
-              "score": null,
-              "total": null,
-              "bookTitle": "",
-              "chapterTitle": "",
-              "timestamp":
-                  (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-              "scoreAyat": data['scoreAyat'] ?? 0,
-              "totalQuestionsAyat": data['totalQuestionsAyat'] ?? 0,
-            };
-          }).toList(),
-        );
-
-    return Rx.combineLatest2(resultsStream, ayatStream, (a, b) {
-      final Map<String, Map<String, dynamic>> merged = {};
-
-      for (var res in a) {
-        merged[res['userId']] = res;
-      }
-
-      for (var ayat in b) {
-        if (merged.containsKey(ayat['userId'])) {
-          merged[ayat['userId']]!['scoreAyat'] = ayat['scoreAyat'];
-          merged[ayat['userId']]!['totalQuestionsAyat'] =
-              ayat['totalQuestionsAyat'];
-        } else {
-          merged[ayat['userId']] = ayat;
-        }
-      }
-
-      final combined = merged.values.toList();
-
-      combined.sort((a, b) {
-        final aScore = double.tryParse(a['score']?.toString() ?? "0") ?? 0.0;
-        final bScore = double.tryParse(b['score']?.toString() ?? "0") ?? 0.0;
-
-        if (bScore.compareTo(aScore) != 0) {
-          return bScore.compareTo(aScore);
-        }
-
-        final aDate = a['timestamp'] as DateTime;
-        final bDate = b['timestamp'] as DateTime;
-        return bDate.compareTo(aDate);
-      });
-
-      return combined;
-    });
+    return resultsRepo.watchCombinedResults();
   }
 
   @override
@@ -223,10 +108,7 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
               IconButton(
                 icon: const Icon(Icons.lock_open),
                 onPressed: () {
-                  FirebaseFirestore.instance
-                      .collection("settings")
-                      .doc("resultsPage")
-                      .set({"enabled": true}, SetOptions(merge: true));
+                  resultsRepo.setResultsPageEnabled(true);
                 },
               ),
           ],
@@ -248,10 +130,7 @@ class _AllUsersResultsPageState extends State<AllUsersResultsPage> {
             IconButton(
               icon: const Icon(Icons.lock),
               onPressed: () {
-                FirebaseFirestore.instance
-                    .collection("settings")
-                    .doc("resultsPage")
-                    .set({"enabled": false}, SetOptions(merge: true));
+                resultsRepo.setResultsPageEnabled(false);
               },
             ),
         ],

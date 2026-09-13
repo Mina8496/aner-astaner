@@ -3,7 +3,6 @@ import 'package:aner_astaner/features/question/presentation/controllers/question
 import 'package:get/get.dart';
 
 class addQusstionPage extends StatefulWidget {
-  static const String kFixedExameID = "nFL11C4v8fPRqIgG0ZAe";
   final String? ChurchID;
   final String? ChapterID;
   final String? AlngelID;

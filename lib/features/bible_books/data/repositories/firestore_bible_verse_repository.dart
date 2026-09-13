@@ -1,3 +1,4 @@
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/bible_verse.dart';
@@ -7,7 +8,6 @@ class FirestoreBibleVerseRepository implements BibleVerseRepository {
   FirestoreBibleVerseRepository({FirebaseFirestore? firestore})
     : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  static const examId = 'nFL11C4v8fPRqIgG0ZAe';
   final FirebaseFirestore _firestore;
 
   CollectionReference<Map<String, dynamic>> _verses({
@@ -19,7 +19,7 @@ class FirestoreBibleVerseRepository implements BibleVerseRepository {
       .collection('Chapters')
       .doc(chapterId)
       .collection('Exames')
-      .doc(examId)
+      .doc(ExamConstants.fixedExamId)
       .collection('AyatQuiz');
 
   @override

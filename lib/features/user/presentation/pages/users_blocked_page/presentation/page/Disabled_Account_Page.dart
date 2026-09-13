@@ -29,8 +29,8 @@ class _DisabledUsersPageState extends State<DisabledUsersPage> {
     if (userData == null) return;
 
     setState(() {
-      currentUserChurchID = userData['ChurchID'] as String?;
-      currentUserRole = userData['role'] as String?;
+      currentUserChurchID = userData.churchID;
+      currentUserRole = userData.role;
     });
   }
 

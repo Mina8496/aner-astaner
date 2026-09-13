@@ -40,10 +40,10 @@ class _EditUserPageState extends State<EditUserPage> {
     if (userData == null || !mounted) return;
 
     setState(() {
-      name = userData['name'] ?? "";
-      churchController = userData['Church'] ?? "";
+      name = userData.name;
+      churchController = userData.church;
 
-      final birthdayData = userData['Birthday'];
+      final birthdayData = userData.birthday;
       if (birthdayData is Timestamp) {
         BirthdayController.text = birthdayData
             .toDate()
@@ -53,15 +53,12 @@ class _EditUserPageState extends State<EditUserPage> {
       } else {
         BirthdayController.text = birthdayData?.toString() ?? "";
       }
-
-      GenderController = userData["Gender"] ?? "";
-      Phone_NamberController.text = userData['Phone_Namber'] ?? "";
-      SeasonController =
-          userData['Season'] ??
-          ""; // SeasonController.text = userDoc['Season'] ?? "";
-      email = userData['email'] ?? "";
-      full_nameController.text = userData['full_name'] ?? "";
-      roleController = userData['role'] ?? "User";
+      GenderController = userData.gender;
+      Phone_NamberController.text = userData.phoneNumber;
+      SeasonController = userData.season;
+      email = userData.email;
+      full_nameController.text = userData.fullName;
+      roleController = userData.role;
     });
   }
 
