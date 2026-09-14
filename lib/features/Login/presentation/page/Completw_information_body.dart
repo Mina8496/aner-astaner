@@ -1,6 +1,6 @@
 import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
-import 'package:aner_astaner/core/widgets/NextButton.dart';
-import 'package:aner_astaner/features/organization/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/core/widgets/next_button.dart';
+import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -1,8 +1,8 @@
 // ignore_for_file: unused_local_variable, use_build_context_synchronously, body_might_complete_normally_nullable, avoid_print
 
 import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
-import 'package:aner_astaner/core/widgets/NextButton.dart';
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
+import 'package:aner_astaner/core/widgets/next_button.dart';
 import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

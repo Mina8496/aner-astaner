@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:aner_astaner/core/widgets/next_button.dart';
 import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
 import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
-import 'package:aner_astaner/core/widgets/NextButton.dart';
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
