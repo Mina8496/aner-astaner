@@ -19,14 +19,11 @@ class FirestoreExamSettingsRepository implements ExamSettingsRepository {
   CollectionReference<Map<String, dynamic>> _settings({
     required String churchId,
     required String chapterId,
-  }) => _firestore
-      .collection('Churches')
-      .doc(churchId)
-      .collection('Chapters')
-      .doc(chapterId)
-      .collection('Exames')
-      .doc(ExamConstants.fixedExamId)
-      .collection('Settings');
+  }) => ExamConstants.settingsCollection(
+    _firestore,
+    churchId: churchId,
+    chapterId: chapterId,
+  );
 
   @override
   Future<ExamSelection?> fetchCurrentSelection() async {

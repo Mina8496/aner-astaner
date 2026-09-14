@@ -17,7 +17,6 @@ import 'package:aner_astaner/core/widgets/isUser_Approved_Or_Admin.dart';
 import 'package:aner_astaner/core/widgets/showHowTo_Qussyion_Dialog.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
 import 'package:aner_astaner/features/exam_settings/presentation/controllers/exam_settings_controller.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -565,10 +564,10 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
                                               activeSetting.hasTimer
                                               ? "نعم"
                                               : "لا";
-                                          final Timestamp startTimestamp =
+                                          final DateTime startDate =
                                               activeSetting.examStart!;
-                                          final DateTime examEndDate =
-                                              startTimestamp.toDate().add(
+                                          final DateTime examEndDate = startDate
+                                              .add(
                                                 Duration(days: durationDays),
                                               );
 
