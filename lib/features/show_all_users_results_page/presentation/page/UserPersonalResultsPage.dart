@@ -1,5 +1,4 @@
 import 'package:aner_astaner/features/show_all_users_results_page/domain/repositories/results_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
@@ -74,9 +73,8 @@ class _UserPersonalResultsPageState extends State<UserPersonalResultsPage> {
                 }
 
                 final results = snapshot.data!.where((data) {
-                  final ts = data['date'] as Timestamp?;
-                  if (ts == null) return false;
-                  final date = ts.toDate();
+                  final date = data['date'] as DateTime?;
+                  if (date == null) return false;
                   return _filterDate(date);
                 }).toList();
 
@@ -94,7 +92,7 @@ class _UserPersonalResultsPageState extends State<UserPersonalResultsPage> {
                   itemCount: results.length,
                   itemBuilder: (context, index) {
                     final data = results[index];
-                    final date = (data['date'] as Timestamp).toDate();
+                    final date = data['date'] as DateTime;
                     final formattedDate = DateFormat(
                       'yyyy/MM/dd – HH:mm',
                     ).format(date);
