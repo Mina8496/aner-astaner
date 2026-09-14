@@ -1,6 +1,5 @@
 import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:aner_astaner/features/exam_settings/domain/entities/exam_setting.dart';
 import 'package:aner_astaner/features/exam_settings/presentation/controllers/exam_settings_controller.dart';
 import 'package:intl/intl.dart';
@@ -44,20 +43,6 @@ class _AllExamsPageState extends State<AllExamsPage> {
       churchId: widget.churchId!,
       chapterId: widget.chapterId!,
     );
-  }
-
-  // ✅ دالة آمنة لتحويل أي قيمة إلى DateTime
-  DateTime? toDate(dynamic value) {
-    if (value == null) return null;
-    if (value is Timestamp) return value.toDate();
-    if (value is DateTime) return value;
-    if (value is Map && value.containsKey('_seconds')) {
-      // في حال كان Timestamp محفوظ كـ Map
-      return DateTime.fromMillisecondsSinceEpoch(
-        (value['_seconds'] as int) * 1000,
-      );
-    }
-    return null;
   }
 
   Future<void> deleteExam(
@@ -146,9 +131,9 @@ class _AllExamsPageState extends State<AllExamsPage> {
               final hasTimer = exam.hasTimer;
               final isRepeatable = exam.isRepeatable;
 
-              final createdAt = toDate(exam.createdAt);
-              final startDate = toDate(exam.examStart);
-              final endDate = toDate(exam.examEnd);
+              final createdAt = exam.createdAt;
+              final startDate = exam.examStart;
+              final endDate = exam.examEnd;
 
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),

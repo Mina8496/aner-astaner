@@ -23,9 +23,9 @@ class ExamSetting {
   final int durationDays;
   final bool isRepeatable;
   final bool hasTimer;
-  final Timestamp? examStart;
-  final Timestamp? examEnd;
-  final Timestamp? createdAt;
+  final DateTime? examStart;
+  final DateTime? examEnd;
+  final DateTime? createdAt;
 
   factory ExamSetting.fromMap(Map<String, dynamic> data) {
     return ExamSetting(
@@ -37,16 +37,16 @@ class ExamSetting {
       durationDays: (data['durationDays'] as num?)?.toInt() ?? 0,
       isRepeatable: data['isRepeatable'] == true,
       hasTimer: data['hasTimer'] == true,
-      examStart: data['examStart'] as Timestamp?,
-      examEnd: data['examEnd'] as Timestamp?,
-      createdAt: data['createdAt'] as Timestamp?,
+      examStart: (data['examStart'] as Timestamp?)?.toDate(),
+      examEnd: (data['examEnd'] as Timestamp?)?.toDate(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
     );
   }
 
   bool isAvailableOn(DateTime date) {
     if (examStart == null || examEnd == null) return false;
 
-    final start = examStart!.toDate();
+    final start = examStart!;
     final startDate = DateTime(start.year, start.month, start.day);
     final endDate = startDate.add(Duration(days: durationDays));
     final dateOnly = DateTime(date.year, date.month, date.day);
