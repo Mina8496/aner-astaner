@@ -1,18 +1,18 @@
+import 'package:aner_astaner/features/alshahat/presentation/page/Chapters_Page.dart';
+import 'package:aner_astaner/features/churches/presentation/pages/churches_page.dart';
+import 'package:aner_astaner/features/churches/presentation/pages/widgets/Add_churches_Box.dart';
 import 'package:flutter/material.dart';
 
-import '../../features/category/presentation/page/AddNewCatgory.dart';
-import '../../features/organization/presentation/pages/widgets/Add_churches_Box.dart';
-import '../../features/category/presentation/page/Category_Page.dart';
-import '../../features/chapter(alshahat)/presentation/page/Chapters_Page.dart';
-import '../../features/organization/presentation/pages/Churches_Page.dart';
-import '../../features/home_page/presentation/page/Home_page.dart';
-import '../../features/Login/presentation/page/Completw_information_body.dart';
-import '../../features/Login/presentation/page/Inital_Login.dart';
-import '../../features/Login/presentation/page/Rigester_View.dart';
-import '../../features/Login/presentation/page/login_Page.dart';
-import '../../features/home_page/presentation/page/MasterHome_Page.dart';
+import '../../features/category/presentation/page/add_new_catgory.dart';
+import '../../features/category/presentation/page/category_page.dart';
+import '../../features/home_page/presentation/page/home_page.dart';
+import '../../features/login/presentation/page/Completw_information_body.dart';
+import '../../features/login/presentation/page/inital_login.dart';
+import '../../features/login/presentation/page/rigester_view.dart';
+import '../../features/login/presentation/page/login_page.dart';
+import '../../features/home_page/presentation/page/master_home_page.dart';
 import '../../features/splash_page/presentation/page/splash_body.dart';
-import '../../features/home_page/presentation/page/widgets/BottomNavBar.dart';
+import '../../features/home_page/presentation/page/widgets/bottom_nav_bar.dart';
 
 abstract final class AppRoutes {
   static const splash = 'splashPage';

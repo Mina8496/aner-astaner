@@ -1,7 +1,7 @@
 import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:flutter/material.dart';
-import 'package:aner_astaner/features/exam_settings/domain/entities/exam_setting.dart';
-import 'package:aner_astaner/features/exam_settings/presentation/controllers/exam_settings_controller.dart';
+import 'package:aner_astaner/features/room_control/exam_settings/domain/entities/exam_setting.dart';
+import 'package:aner_astaner/features/room_control/exam_settings/presentation/controllers/exam_settings_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:get/get.dart';

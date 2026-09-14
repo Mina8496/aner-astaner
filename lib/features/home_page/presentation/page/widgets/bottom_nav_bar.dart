@@ -1,8 +1,8 @@
 
-import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/All_Users_Results_Page.dart';
-import 'package:aner_astaner/features/church_users_results/presentation/view/Church_Users_ResultsPage.dart';
-import 'package:aner_astaner/features/home_page/presentation/page/Home_page.dart';
-import 'package:aner_astaner/features/audio/presentation/page/Music_page.dart';
+import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/all_users_results_page.dart';
+import 'package:aner_astaner/features/church_users_results/presentation/page/church_users_results_page.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/home_page.dart';
+import 'package:aner_astaner/features/audio/presentation/page/music_page.dart';
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 

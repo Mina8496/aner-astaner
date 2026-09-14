@@ -1,6 +1,6 @@
-import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
+import 'package:aner_astaner/core/widgets/custem_text_field.dart';
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
-import 'package:aner_astaner/features/organization/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';

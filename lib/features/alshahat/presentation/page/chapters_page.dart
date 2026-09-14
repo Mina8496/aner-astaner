@@ -1,24 +1,26 @@
-import 'package:aner_astaner/features/organization/presentation/pages/widgets/Add_churches_Box.dart';
-import 'package:aner_astaner/features/chapter(alshahat)/presentation/page/Chapters_Page.dart';
-import 'package:aner_astaner/features/organization/domain/entities/organization_item.dart';
-import 'package:aner_astaner/features/organization/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/features/alshahat/presentation/page/widgets/Add_Chapters_Box.dart';
+import 'package:aner_astaner/features/churches/domain/entities/organization_item.dart';
+import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/features/room_control/presentation/page/Room_Page.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class ChurchesPage extends StatefulWidget {
-  const ChurchesPage({super.key});
+class ChaptersPage extends StatefulWidget {
+  final String? ChurchID;
+
+  const ChaptersPage({super.key, this.ChurchID});
 
   @override
-  State<ChurchesPage> createState() => _ChurchesPageState();
+  State<ChaptersPage> createState() => _ChaptersPageState();
 }
 
-class _ChurchesPageState extends State<ChurchesPage> {
-  List<OrganizationItem> churches = [];
+class _ChaptersPageState extends State<ChaptersPage> {
+  List<OrganizationItem> chapters = [];
   bool isLoading = true;
   String role = '';
-  String? churchId;
+  String? selectedChapterId;
 
   final organizationController = Get.find<OrganizationController>();
   final userController = Get.find<UserController>();
@@ -26,10 +28,10 @@ class _ChurchesPageState extends State<ChurchesPage> {
   @override
   void initState() {
     super.initState();
-    getData();
+    fetchChapters();
   }
 
-  Future<void> getData() async {
+  Future<void> fetchChapters() async {
     setState(() => isLoading = true);
     final profile = await userController.fetchCurrentUserProfile();
     if (profile == null) {
@@ -38,23 +40,34 @@ class _ChurchesPageState extends State<ChurchesPage> {
     }
 
     role = profile.role ?? '';
-    churchId = profile.churchId;
-    churches = await organizationController.fetchChurches(
+    selectedChapterId = profile.chapterId;
+    chapters = await organizationController.fetchChapters(
+      churchId: widget.ChurchID,
       role: role,
-      churchId: churchId,
+      selectedChapterId: selectedChapterId,
     );
     if (mounted) setState(() => isLoading = false);
   }
 
-  Future<void> editChurchName(String id, String currentName) async {
+  Future<void> deleteChapter(String chapterId) async {
+    final churchId = widget.ChurchID;
+    if (churchId == null) return;
+    await organizationController.deleteChapter(
+      churchId: churchId,
+      chapterId: chapterId,
+    );
+    await fetchChapters();
+  }
+
+  Future<void> editChapterName(String id, String currentName) async {
     final controller = TextEditingController(text: currentName);
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تعديل اسم الكنيسة'),
+        title: const Text('تعديل اسم الفصل'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(labelText: 'اسم الكنيسة الجديد'),
+          decoration: const InputDecoration(labelText: 'اسم الفصل الجديد'),
         ),
         actions: [
           TextButton(
@@ -63,11 +76,16 @@ class _ChurchesPageState extends State<ChurchesPage> {
           ),
           ElevatedButton(
             onPressed: () async {
+              final churchId = widget.ChurchID;
               final name = controller.text.trim();
-              if (name.isEmpty) return;
-              await organizationController.updateChurch(id, name);
+              if (churchId == null || name.isEmpty) return;
+              await organizationController.updateChapter(
+                churchId: churchId,
+                chapterId: id,
+                season: name,
+              );
               if (dialogContext.mounted) Navigator.pop(dialogContext);
-              await getData();
+              await fetchChapters();
             },
             child: const Text('حفظ'),
           ),
@@ -77,12 +95,12 @@ class _ChurchesPageState extends State<ChurchesPage> {
     controller.dispose();
   }
 
-  Future<void> confirmDeleteChurch(String id) async {
+  Future<void> showDeleteDialog(String chapterId) async {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('تأكيد الحذف'),
-        content: const Text('هل أنت متأكد من حذف الكنيسة؟'),
+        content: const Text('هل أنت متأكد أنك تريد حذف هذا الفصل؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -91,8 +109,7 @@ class _ChurchesPageState extends State<ChurchesPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-              await organizationController.deleteChurch(id);
-              await getData();
+              await deleteChapter(chapterId);
             },
             child: const Text('نعم'),
           ),
@@ -101,9 +118,9 @@ class _ChurchesPageState extends State<ChurchesPage> {
     );
   }
 
-  void showChurchActions(OrganizationItem church) {
+  void showChapterActions(OrganizationItem chapter) {
     if (role == 'Admin') {
-      editChurchName(church.id, church.title);
+      editChapterName(chapter.id, chapter.title);
       return;
     }
     if (role != 'SuperAdmin') return;
@@ -114,18 +131,18 @@ class _ChurchesPageState extends State<ChurchesPage> {
         children: [
           ListTile(
             leading: const Icon(Icons.edit, color: Colors.blue),
-            title: const Text('تعديل اسم الكنيسة'),
+            title: const Text('تعديل'),
             onTap: () {
               Navigator.pop(sheetContext);
-              editChurchName(church.id, church.title);
+              editChapterName(chapter.id, chapter.title);
             },
           ),
           ListTile(
             leading: const Icon(Icons.delete, color: Colors.red),
-            title: const Text('حذف الكنيسة'),
+            title: const Text('حذف'),
             onTap: () {
               Navigator.pop(sheetContext);
-              confirmDeleteChurch(church.id);
+              showDeleteDialog(chapter.id);
             },
           ),
         ],
@@ -137,33 +154,39 @@ class _ChurchesPageState extends State<ChurchesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('المحافظات والكنائس'),
+        title: const Text('الفصول'),
         centerTitle: true,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
         padding: EdgeInsets.all(8.0.h),
         child: isLoading
             ? const Center(child: CircularProgressIndicator())
-            : churches.isEmpty
-            ? const Center(child: Text('لا توجد كنائس لعرضها'))
+            : chapters.isEmpty
+            ? const Center(child: Text('لا توجد فصول حالياً'))
             : GridView.builder(
-                itemCount: churches.length,
+                itemCount: chapters.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.8,
                 ),
                 itemBuilder: (context, index) {
-                  final church = churches[index];
+                  final chapter = chapters[index];
                   return InkWell(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (_) => ChaptersPage(ChurchID: church.id),
+                        builder: (_) => RoomPage(
+                          ChurchID: widget.ChurchID,
+                          ChapterID: chapter.id,
+                        ),
                       ),
                     ),
-                    onLongPress: () => showChurchActions(church),
+                    onLongPress: () => showChapterActions(chapter),
                     child: Card(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -172,12 +195,12 @@ class _ChurchesPageState extends State<ChurchesPage> {
                             'assets/images/Splash_View2.png',
                             height: 100.h,
                           ),
+                          SizedBox(height: 10.h),
                           Text(
-                            church.title,
-                            textAlign: TextAlign.center,
+                            chapter.title,
                             style: TextStyle(
-                              fontSize: 10.sp,
                               fontWeight: FontWeight.bold,
+                              fontSize: 10.sp,
                             ),
                           ),
                         ],
@@ -193,8 +216,8 @@ class _ChurchesPageState extends State<ChurchesPage> {
               onPressed: () => showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (_) => AddChurchesBox(onSuccess: getData),
-              ),
+                builder: (_) => AddChaptersBox(churchID: widget.ChurchID),
+              ).then((_) => fetchChapters()),
               child: const Icon(Icons.add),
             )
           : null,

@@ -1,9 +1,9 @@
-import 'package:aner_astaner/features/user/presentation/pages/users_blocked_page/presentation/page/Disabled_Account_Page.dart';
-import 'package:aner_astaner/features/Login/presentation/page/Edit_User_Profile_Page.dart';
-import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/UserPersonalResultsPage.dart';
-import 'package:aner_astaner/features/home_page/presentation/page/widgets/BottomNavBar.dart';
-import 'package:aner_astaner/features/home_page/presentation/page/widgets/MenuWidget.dart';
-import 'package:aner_astaner/features/home_page/presentation/page/widgets/menuItem.dart';
+import 'package:aner_astaner/features/user/presentation/pages/users_blocked_page/presentation/page/disabled_account_page.dart';
+import 'package:aner_astaner/features/login/presentation/page/edit_user_profile_page.dart';
+import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/user_personal_results_page.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/widgets/bottom_nav_bar.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/widgets/menu_widget.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/widgets/menu_Item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';

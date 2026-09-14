@@ -1,5 +1,5 @@
-import 'package:aner_astaner/features/chapter(alshahat)/presentation/page/addAlshahatPage.dart';
-import 'package:aner_astaner/features/chapter(alshahat)/presentation/controllers/chapter_controller.dart';
+import 'package:aner_astaner/features/alshahat/presentation/controllers/chapter_controller.dart';
+import 'package:aner_astaner/features/alshahat/presentation/page/add_alshahat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';

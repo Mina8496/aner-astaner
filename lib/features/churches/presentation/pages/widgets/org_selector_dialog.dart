@@ -1,5 +1,5 @@
-import 'package:aner_astaner/features/organization/domain/entities/organization_item.dart';
-import 'package:aner_astaner/features/organization/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/features/churches/domain/entities/organization_item.dart';
+import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
