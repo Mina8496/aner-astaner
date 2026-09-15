@@ -1,5 +1,5 @@
+import 'package:aner_astaner/features/user/presentation/pages/edit_user_profile_page.dart';
 import 'package:aner_astaner/features/user/presentation/pages/users_blocked_page/presentation/page/disabled_account_page.dart';
-import 'package:aner_astaner/features/login/presentation/page/edit_user_profile_page.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/presentation/page/user_personal_results_page.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/bottom_nav_bar.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/menu_widget.dart';

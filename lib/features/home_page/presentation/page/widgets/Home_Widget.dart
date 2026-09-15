@@ -3,13 +3,13 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:aner_astaner/features/churches/presentation/pages/churches_page.dart';
 import 'package:aner_astaner/features/churches/presentation/pages/widgets/org_selector_dialog.dart';
+import 'package:aner_astaner/features/login/presentation/page/complete_information_page.dart';
 import 'package:aner_astaner/features/rewards_page/presentation/page/rewards_page.dart';
 import 'package:aner_astaner/features/verses_exam_quiz/presentation/pages/verses_exam_quiz_page.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_model.dart';
 import 'package:aner_astaner/features/user/domain/repositories/profile_image_uploader.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:aner_astaner/features/multiple_choice_quiz/presentation/page/Exames_Quiz_Page.dart';
-import 'package:aner_astaner/features/login/presentation/page/Completw_information_body.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/bible_read_button.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/bubble_top_tail_painter.dart';
 import 'package:aner_astaner/features/home_page/presentation/page/widgets/chat_bubble.dart';
@@ -375,7 +375,7 @@ class _HomeWidgetState extends State<HomeWidget> with TickerProviderStateMixin {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Get.to(() => const CompleteInformationBody());
+              Get.to(() => const CompleteInformationPage());
             },
             child: const Text("إكمال البيانات"),
           ),

@@ -1,4 +1,4 @@
-import 'package:aner_astaner/features/login/presentation/page/edit_user_page.dart';
+import 'package:aner_astaner/features/user/presentation/pages/edit_user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_summary.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';

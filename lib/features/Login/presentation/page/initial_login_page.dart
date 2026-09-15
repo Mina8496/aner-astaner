@@ -1,21 +1,20 @@
-// ignore_for_file: unused_local_variable, use_build_context_synchronously, body_might_complete_normally_nullable, avoid_print
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
-import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
+import 'package:aner_astaner/features/login/presentation/controllers/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class InitalLogin extends StatefulWidget {
-  const InitalLogin({super.key});
+class InitialLoginPage extends StatefulWidget {
+  const InitialLoginPage({super.key});
 
   @override
-  State<InitalLogin> createState() => _InitalLoginState();
+  State<InitialLoginPage> createState() => _InitialLoginPageState();
 }
 
-class _InitalLoginState extends State<InitalLogin> {
+class _InitialLoginPageState extends State<InitialLoginPage> {
   GlobalKey<FormState> formstate = GlobalKey<FormState>();
   bool isLoading = false;
-  final AuthService authService = Get.find<AuthService>();
+  final LoginController authService = Get.find<LoginController>();
 
   Future<void> signInWithGoogle(BuildContext context) async {
     setState(() {

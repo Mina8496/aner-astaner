@@ -12,15 +12,15 @@ import 'package:intl/intl.dart';
 import 'package:cupertino_date_textbox/cupertino_date_textbox.dart';
 import 'package:get/get.dart';
 
-class CompleteInformationBody extends StatefulWidget {
-  const CompleteInformationBody({super.key});
+class CompleteInformationPage extends StatefulWidget {
+  const CompleteInformationPage({super.key});
 
   @override
-  State<CompleteInformationBody> createState() =>
-      _CompleteInformationBodyState();
+  State<CompleteInformationPage> createState() =>
+      _CompleteInformationPageState();
 }
 
-class _CompleteInformationBodyState extends State<CompleteInformationBody> {
+class _CompleteInformationPageState extends State<CompleteInformationPage> {
   DateTime _selectedDateTime = DateTime.now();
   bool isLoading = false;
 

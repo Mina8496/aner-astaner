@@ -1,25 +1,24 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:aner_astaner/core/widgets/next_button.dart';
-import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
+import 'package:aner_astaner/features/login/presentation/controllers/login_controller.dart';
 import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class RigesterView extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  State<RigesterView> createState() => _RigesterViewState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RigesterViewState extends State<RigesterView> {
+class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController newEmail = TextEditingController();
   final TextEditingController newPassword = TextEditingController();
   final GlobalKey<FormState> formstate = GlobalKey<FormState>();
-  AuthService get authService => Get.find<AuthService>();
+  LoginController get authService => Get.find<LoginController>();
   bool isLoading = false;
 
   @override
@@ -271,23 +270,17 @@ class _RigesterViewState extends State<RigesterView> {
             ),
           );
 
-          User? user = await authService.signInWithGoogle();
+          User? user = await authService.signInWithGoogle(ensureProfile: false);
 
           Navigator.pop(context); // Close loading
 
           if (user != null) {
-            final userDoc = FirebaseFirestore.instance
-                .collection('users')
-                .doc(user.uid);
-            final snapshot = await userDoc.get();
+            final userProfile = await authService.getUserProfile(user);
 
-            if (snapshot.exists) {
+            if (userProfile != null) {
               Navigator.pushReplacementNamed(context, 'MasterHome');
             } else {
-              await userDoc.set({
-                'email': user.email,
-                'createdAt': FieldValue.serverTimestamp(),
-              });
+              await authService.ensureUserProfile(user);
               Navigator.pushReplacementNamed(context, 'comLogin');
             }
           }

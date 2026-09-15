@@ -3,6 +3,7 @@ import 'package:aner_astaner/features/churches/domain/repositories/organization_
 import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/data/repositories/firestore_exam_catalog_repository.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/domain/repositories/exam_catalog_repository.dart';
+import 'package:aner_astaner/features/login/presentation/controllers/login_controller.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/data/repo/firestore_results_repository.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/domain/repositories/results_repository.dart';
 import 'package:aner_astaner/features/user/data/repositories/firestore_user_repository.dart';
@@ -33,6 +34,10 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<AuthService>(AuthService.new, fenix: true);
+    Get.lazyPut<LoginController>(
+      () => LoginController(authRepository: Get.find<AuthService>()),
+      fenix: true,
+    );
     Get.lazyPut<AuthorizationRepository>(
       FirestoreAuthorizationRepository.new,
       fenix: true,
@@ -50,7 +55,10 @@ class AppBindings extends Bindings {
           ExamCatalogController(repository: Get.find<ExamCatalogRepository>()),
       fenix: true,
     );
-    Get.lazyPut<ExamQuizRepository>(FirestoreExamQuizRepository.new, fenix: true);
+    Get.lazyPut<ExamQuizRepository>(
+      FirestoreExamQuizRepository.new,
+      fenix: true,
+    );
     Get.lazyPut<RewardRepository>(FirestoreRewardRepository.new, fenix: true);
     Get.lazyPut<ExamSettingsController>(
       ExamSettingsController.new,
@@ -59,7 +67,7 @@ class AppBindings extends Bindings {
     Get.lazyPut<QuestionController>(QuestionController.new, fenix: true);
 
     Get.lazyPut<ResultsRepository>(FirestoreResultsRepository.new, fenix: true);
-    
+
     Get.lazyPut<OrganizationRepository>(
       FirestoreOrganizationRepository.new,
       fenix: true,

@@ -1,8 +1,8 @@
 // ignore_for_file: unused_element
 
 import 'package:aner_astaner/core/constants/exam_constants.dart';
-import 'package:aner_astaner/features/login/presentation/page/edit_user_page.dart';
 import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
+import 'package:aner_astaner/features/user/presentation/pages/edit_user_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
