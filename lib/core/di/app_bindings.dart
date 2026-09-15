@@ -1,7 +1,9 @@
+import 'package:aner_astaner/features/churches/data/repositories/firestore_organization_repository.dart';
+import 'package:aner_astaner/features/churches/domain/repositories/organization_repository.dart';
+import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/data/repositories/firestore_exam_catalog_repository.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/domain/repositories/exam_catalog_repository.dart';
-import 'package:aner_astaner/features/organization/data/repositories/firestore_organization_repository.dart';
-import 'package:aner_astaner/features/organization/domain/repositories/organization_repository.dart';
+import 'package:aner_astaner/features/login/presentation/controllers/login_controller.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/data/repo/firestore_results_repository.dart';
 import 'package:aner_astaner/features/show_all_users_results_page/domain/repositories/results_repository.dart';
 import 'package:aner_astaner/features/user/data/repositories/firestore_user_repository.dart';
@@ -18,9 +20,8 @@ import '../../features/authorization/domain/repositories/authorization_repositor
 import '../../features/category/presentation/controllers/category_controller.dart';
 import '../../features/exam/presentation/controllers/exam_controller.dart';
 import '../../features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
-import '../../features/exam_settings/presentation/controllers/exam_settings_controller.dart';
+import '../../features/room_control/exam_settings/presentation/controllers/exam_settings_controller.dart';
 import '../../features/question/presentation/controllers/question_controller.dart';
-import '../../features/organization/presentation/controllers/organization_controller.dart';
 import 'package:aner_astaner/features/app_update/data/repositories/firestore_app_update_repository.dart';
 import 'package:aner_astaner/features/app_update/domain/repositories/app_update_repository.dart';
 import '../../features/user/presentation/controllers/user_controller.dart';
@@ -33,6 +34,10 @@ class AppBindings extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<AuthService>(AuthService.new, fenix: true);
+    Get.lazyPut<LoginController>(
+      () => LoginController(authRepository: Get.find<AuthService>()),
+      fenix: true,
+    );
     Get.lazyPut<AuthorizationRepository>(
       FirestoreAuthorizationRepository.new,
       fenix: true,
@@ -50,7 +55,10 @@ class AppBindings extends Bindings {
           ExamCatalogController(repository: Get.find<ExamCatalogRepository>()),
       fenix: true,
     );
-    Get.lazyPut<ExamQuizRepository>(FirestoreExamQuizRepository.new, fenix: true);
+    Get.lazyPut<ExamQuizRepository>(
+      FirestoreExamQuizRepository.new,
+      fenix: true,
+    );
     Get.lazyPut<RewardRepository>(FirestoreRewardRepository.new, fenix: true);
     Get.lazyPut<ExamSettingsController>(
       ExamSettingsController.new,
@@ -59,7 +67,7 @@ class AppBindings extends Bindings {
     Get.lazyPut<QuestionController>(QuestionController.new, fenix: true);
 
     Get.lazyPut<ResultsRepository>(FirestoreResultsRepository.new, fenix: true);
-    
+
     Get.lazyPut<OrganizationRepository>(
       FirestoreOrganizationRepository.new,
       fenix: true,
