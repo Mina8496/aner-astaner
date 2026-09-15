@@ -1,5 +1,6 @@
 import 'package:aner_astaner/features/multiple_choice_quiz/domain/repositories/exam_quiz_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:aner_astaner/core/constants/exam_constants.dart';
 
 class FirestoreExamQuizRepository implements ExamQuizRepository {
   @override
@@ -25,15 +26,12 @@ class FirestoreExamQuizRepository implements ExamQuizRepository {
     required String chapterId,
     required String examId,
   }) async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('Churches')
-        .doc(churchId)
-        .collection('Chapters')
-        .doc(chapterId)
-        .collection('Exames')
-        .doc(examId)
-        .collection('Settings')
-        .get();
+    final snapshot = await ExamConstants.settingsCollection(
+      FirebaseFirestore.instance,
+      churchId: churchId,
+      chapterId: chapterId,
+      examId: examId,
+    ).get();
     return snapshot.docs.map((d) => d.data()).toList();
   }
 
