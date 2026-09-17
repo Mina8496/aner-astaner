@@ -92,7 +92,7 @@ class _ChaptersPageState extends State<ChaptersPage> {
         ],
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
   }
 
   Future<void> showDeleteDialog(String chapterId) async {

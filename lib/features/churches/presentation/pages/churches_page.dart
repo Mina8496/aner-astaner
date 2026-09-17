@@ -74,7 +74,7 @@ class _ChurchesPageState extends State<ChurchesPage> {
         ],
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
   }
 
   Future<void> confirmDeleteChurch(String id) async {
