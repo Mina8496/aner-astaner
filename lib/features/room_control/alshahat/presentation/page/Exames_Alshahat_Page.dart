@@ -1,4 +1,4 @@
-import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/widgets/Add_Exames_Alshahat_Box.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/widgets/add_exames_alshahat_box.dart';
 import 'package:aner_astaner/features/room_control/question_or_edit_questions/presentation/page/Exames_Questions_Page.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_chapter/presentation/controllers/exam_chapter_controller.dart';
 import 'package:flutter/material.dart';
