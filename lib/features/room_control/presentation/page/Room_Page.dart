@@ -1,10 +1,10 @@
-import 'package:aner_astaner/features/show_all_exams_page/presentation/view/All_Exames_page.dart';
-import 'package:aner_astaner/features/room_control/ayat_control/presentation/page/Ayat_Admin_Page.dart';
+import 'package:aner_astaner/features/show_all_exams_page/presentation/page/All_Exames_page.dart';
+import 'package:aner_astaner/features/room_control/ayat_control/presentation/page/ayat_admin_page.dart';
 import 'package:aner_astaner/features/room_control/class_servants/presentation/pages/search_users_page.dart';
-import 'package:aner_astaner/features/room_control/ayat_control/presentation/page/ExamVersesSettingsDialog.dart';
-import 'package:aner_astaner/features/room_control/exam_setting/presentation/pages/Exam_Settings_Dialog.dart';
-import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/Exames_Alngel_Page.dart';
-import 'package:aner_astaner/features/room_control/manage_users_tabs/presentation/pages/Manage_Users_Tabs_Page.dart';
+import 'package:aner_astaner/features/room_control/ayat_control/presentation/page/exam_verses_settings_dialog.dart';
+import 'package:aner_astaner/features/room_control/exam_settings/presentation/page/exam_settings_dialog.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/exames_alngel_page.dart';
+import 'package:aner_astaner/features/room_control/manage_users_tabs/presentation/pages/manage_users_tabs_page.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -25,13 +25,14 @@ class _RoomPageState extends State<RoomPage> {
   bool isSuperAdmin = false;
 
   Future<void> checkIfSuperAdmin() async {
-  final profile = await Get.find<UserController>().fetchCurrentUserProfile();
-  if (profile != null) {
-    setState(() {
-      isSuperAdmin = profile.role == 'SuperAdmin';
-    });
+    final profile = await Get.find<UserController>().fetchCurrentUserProfile();
+    if (!mounted) return;
+    if (profile != null) {
+      setState(() {
+        isSuperAdmin = profile.role == 'SuperAdmin';
+      });
+    }
   }
-}
 
   @override
   void initState() {

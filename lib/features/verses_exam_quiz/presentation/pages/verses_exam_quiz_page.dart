@@ -5,9 +5,9 @@ import 'dart:math';
 
 import 'package:aner_astaner/core/constants/exam_constants.dart';
 import 'package:aner_astaner/features/audio/presentation/controllers/audio_controller.dart';
-import 'package:aner_astaner/features/home_page/presentation/page/MasterHome_Page.dart';
-import 'package:aner_astaner/core/widgets/ProgressTimer.dart';
-import 'package:aner_astaner/core/widgets/result_Box.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/master_home_page.dart';
+import 'package:aner_astaner/core/widgets/progress_timer.dart';
+import 'package:aner_astaner/core/widgets/result_box.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

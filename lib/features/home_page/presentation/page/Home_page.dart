@@ -1,6 +1,6 @@
 
-import 'package:aner_astaner/features/home_page/presentation/page/widgets/Home_Widget.dart';
-import 'package:aner_astaner/core/widgets/showHowTo_Qussyion_Dialog.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/widgets/home_widget.dart';
+import 'package:aner_astaner/core/widgets/show_how_to_qussyion_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:flutter/material.dart';
