@@ -5,10 +5,10 @@ import 'package:aner_astaner/features/audio/presentation/controllers/audio_contr
 import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
 import 'package:aner_astaner/features/exam/presentation/controllers/exam_controller.dart';
 import 'package:aner_astaner/core/constants/app_colors.dart';
-import 'package:aner_astaner/features/home_page/presentation/page/MasterHome_Page.dart';
-import 'package:aner_astaner/core/widgets/ProgressTimer.dart';
+import 'package:aner_astaner/features/home_page/presentation/page/master_home_page.dart';
+import 'package:aner_astaner/core/widgets/progress_timer.dart';
 import 'package:aner_astaner/core/widgets/option_card.dart';
-import 'package:aner_astaner/core/widgets/result_Box.dart';
+import 'package:aner_astaner/core/widgets/result_box.dart';
 import 'package:aner_astaner/features/multiple_choice_quiz/domain/repositories/exam_quiz_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
