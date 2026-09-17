@@ -38,7 +38,10 @@ class _BibleReadButtonState extends State<BibleReadButton>
       onTapCancel: _onTapCancel,
       onTap: () {
         // نفذ الإجراء هنا
-        Navigator.push(context, MaterialPageRoute(builder: (context) => BiblePage() ),);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => BibleBooksPage()),
+        );
       },
       child: AnimatedScale(
         scale: _scale,
