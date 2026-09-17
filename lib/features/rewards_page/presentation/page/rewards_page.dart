@@ -10,6 +10,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
+import '../controllers/rewards_page_controller.dart';
+
 class RewardsPage extends StatefulWidget {
   final String? churchId;
   final String? chapterId;
@@ -20,41 +22,31 @@ class RewardsPage extends StatefulWidget {
 }
 
 class _RewardsPageState extends State<RewardsPage> {
-  bool _isAdmin = false;
-  String? _churchId;
-  String? _chapterId;
+  late final pageController = RewardsPageController(
+    rewardRepository: Get.find<RewardRepository>(),
+    userRepository: Get.find<UserRepository>(),
+  );
 
   @override
   void initState() {
     super.initState();
-    checkIfAdmin();
+    _checkIfAdmin();
     _resolveOrganization();
   }
 
-  Future<void> _resolveOrganization() async {
-    if (widget.churchId != null && widget.chapterId != null) {
-      if (!mounted) return;
-      setState(() {
-        _churchId = widget.churchId;
-        _chapterId = widget.chapterId;
-      });
-      return;
-    }
-    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
+  Future<void> _checkIfAdmin() async {
+    await pageController.checkIfAdmin();
     if (!mounted) return;
-    setState(() {
-      _churchId = widget.churchId ?? profile?.churchId;
-      _chapterId = widget.chapterId ?? profile?.chapterId;
-    });
+    setState(() {});
   }
 
-  Future<void> checkIfAdmin() async {
-    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
-    final role = profile?.role ?? "user";
-
-    if (role == "Admin" || role == "SuperAdmin") {
-      setState(() => _isAdmin = true);
-    }
+  Future<void> _resolveOrganization() async {
+    await pageController.resolveOrganization(
+      churchId: widget.churchId,
+      chapterId: widget.chapterId,
+    );
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<String?> uploadImage(Uint8List bytes) async {
@@ -77,15 +69,15 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   Future<void> addOrEditReward({String? docId, String? oldImageUrl}) async {
-    final churchId = _churchId;
-    final chapterId = _chapterId;
+    final churchId = pageController.churchId;
+    final chapterId = pageController.chapterId;
     final titleController = TextEditingController();
     final descController = TextEditingController();
     Uint8List? newImageBytes;
     String? finalUrl = oldImageUrl;
 
     if (docId != null) {
-      final data = await Get.find<RewardRepository>().fetchRewardData(docId);
+      final data = await pageController.fetchRewardData(docId);
       if (data != null) {
         titleController.text = data['title'] ?? "";
         descController.text = data['description'] ?? "";
@@ -191,12 +183,9 @@ class _RewardsPageState extends State<RewardsPage> {
                     };
 
                     if (docId == null) {
-                      await Get.find<RewardRepository>().addReward(data);
+                      await pageController.addReward(data);
                     } else {
-                      await Get.find<RewardRepository>().updateReward(
-                        docId,
-                        data,
-                      );
+                      await pageController.updateReward(docId, data);
                     }
 
                     if (mounted) Navigator.pop(context);
@@ -211,123 +200,115 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   Future<void> deleteReward(String docId) async {
-    await Get.find<RewardRepository>().deleteReward(docId);
+    await pageController.deleteReward(docId);
     if (!mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("🗑️ تم حذف الجائزة")));
   }
 
+  Widget? _buildFab() {
+    if (!pageController.isAdmin) return null;
+    return FloatingActionButton(
+      onPressed: () => addOrEditReward(),
+      child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _buildRewardActions(Reward reward) {
+    return OverflowBar(
+      alignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.edit, color: Colors.blue),
+          onPressed: () => addOrEditReward(
+            docId: reward.id,
+            oldImageUrl: reward.imageUrl,
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete, color: Colors.red),
+          onPressed: () => deleteReward(reward.id),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRewardCard(Reward reward) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: Image.network(reward.imageUrl, fit: BoxFit.cover),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  reward.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  reward.description,
+                  style: const TextStyle(fontSize: 13),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          if (pageController.isAdmin) _buildRewardActions(reward),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRewardsGrid(List<Reward> rewards) {
+    if (rewards.isEmpty) {
+      return const Center(child: Text("لا توجد جوائز بعد 🎁"));
+    }
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.7,
+      ),
+      itemCount: rewards.length,
+      itemBuilder: (context, index) => _buildRewardCard(rewards[index]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("🏆 الجوائز"), centerTitle: true),
-      floatingActionButton: _isAdmin
-          ? FloatingActionButton(
-              onPressed: () => addOrEditReward(),
-              child: const Icon(Icons.add),
-            )
-          : null,
-      body: _churchId == null || _chapterId == null
+      floatingActionButton: _buildFab(),
+      body: pageController.churchId == null || pageController.chapterId == null
           ? const Center(child: CircularProgressIndicator())
           : StreamBuilder<List<Reward>>(
-              stream: Get.find<RewardRepository>().watchRewards(
-                churchId: _churchId!,
-                chapterId: _chapterId!,
-              ),
+              stream: pageController.watchRewards(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
-
-                final rewards = snapshot.data!;
-
-                if (rewards.isEmpty) {
-                  return const Center(child: Text("لا توجد جوائز بعد 🎁"));
-                }
-
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.7,
-                  ),
-                  itemCount: rewards.length,
-                  itemBuilder: (context, index) {
-                    final reward = rewards[index];
-                    final docId = reward.id;
-
-                    return Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(16),
-                              ),
-                              child: Image.network(
-                                reward.imageUrl,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  reward.title,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  reward.description,
-                                  style: const TextStyle(fontSize: 13),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (_isAdmin)
-                            OverflowBar(
-                              alignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.edit,
-                                    color: Colors.blue,
-                                  ),
-                                  onPressed: () => addOrEditReward(
-                                    docId: docId,
-                                    oldImageUrl: reward.imageUrl,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () => deleteReward(docId),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    );
-                  },
-                );
+                return _buildRewardsGrid(snapshot.data!);
               },
             ),
     );
