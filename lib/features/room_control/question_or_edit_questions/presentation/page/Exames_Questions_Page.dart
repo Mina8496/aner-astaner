@@ -1,5 +1,5 @@
-import 'package:aner_astaner/features/question/presentation/view/Add_Qusstion_page.dart';
-import 'package:aner_astaner/features/room_control/question_or_edit_questions/presentation/page/Exames_Edit_Questions_Page.dart';
+import 'package:aner_astaner/features/question/presentation/page/add_qusstion_page.dart';
+import 'package:aner_astaner/features/room_control/question_or_edit_questions/presentation/page/exames_edit_questions_page.dart';
 import 'package:flutter/material.dart';
 import 'package:aner_astaner/features/question/presentation/controllers/question_controller.dart';
 import 'package:get/get.dart';

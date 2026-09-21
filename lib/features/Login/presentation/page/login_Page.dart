@@ -1,23 +1,23 @@
 // ignore_for_file: unused_local_variable, use_build_context_synchronously, body_might_complete_normally_nullable, avoid_print
 
 import 'package:aner_astaner/core/widgets/Custem_text_field.dart';
-import 'package:aner_astaner/core/widgets/NextButton.dart';
 import 'package:aner_astaner/core/widgets/custom_general_buttions.dart';
-import 'package:aner_astaner/features/auth/data/services/auth_service.dart';
+import 'package:aner_astaner/core/widgets/next_button.dart';
+import 'package:aner_astaner/features/login/presentation/controllers/login_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
-class loginPage extends StatefulWidget {
-  loginPage({super.key});
+class LoginPage extends StatefulWidget {
+  LoginPage({super.key});
 
   @override
-  State<loginPage> createState() => _loginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _loginPageState extends State<loginPage> {
-  final AuthService authService = Get.find<AuthService>();
+class _LoginPageState extends State<LoginPage> {
+final LoginController authService = Get.find<LoginController>();
   TextEditingController newEmail = TextEditingController();
   TextEditingController newPassword = TextEditingController();
 
