@@ -1,11 +1,9 @@
 import 'package:aner_astaner/features/alshahat/presentation/page/widgets/Add_Chapters_Box.dart';
 import 'package:aner_astaner/features/churches/domain/entities/organization_item.dart';
-import 'package:aner_astaner/features/churches/presentation/controllers/organization_controller.dart';
+import 'package:aner_astaner/features/churches/presentation/controllers/chapters_page_controller.dart';
 import 'package:aner_astaner/features/room_control/presentation/page/Room_Page.dart';
-import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 class ChaptersPage extends StatefulWidget {
   final String? ChurchID;
@@ -17,56 +15,28 @@ class ChaptersPage extends StatefulWidget {
 }
 
 class _ChaptersPageState extends State<ChaptersPage> {
-  List<OrganizationItem> chapters = [];
-  bool isLoading = true;
-  String role = '';
-  String? selectedChapterId;
-
-  final organizationController = Get.find<OrganizationController>();
-  final userController = Get.find<UserController>();
+  late final ChaptersPageController controller;
 
   @override
   void initState() {
     super.initState();
-    fetchChapters();
-  }
-
-  Future<void> fetchChapters() async {
-    setState(() => isLoading = true);
-    final profile = await userController.fetchCurrentUserProfile();
-    if (profile == null) {
-      if (mounted) setState(() => isLoading = false);
-      return;
-    }
-
-    role = profile.role ?? '';
-    selectedChapterId = profile.chapterId;
-    chapters = await organizationController.fetchChapters(
+    controller = ChaptersPageController(
       churchId: widget.ChurchID,
-      role: role,
-      selectedChapterId: selectedChapterId,
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
     );
-    if (mounted) setState(() => isLoading = false);
-  }
-
-  Future<void> deleteChapter(String chapterId) async {
-    final churchId = widget.ChurchID;
-    if (churchId == null) return;
-    await organizationController.deleteChapter(
-      churchId: churchId,
-      chapterId: chapterId,
-    );
-    await fetchChapters();
+    controller.fetchChapters();
   }
 
   Future<void> editChapterName(String id, String currentName) async {
-    final controller = TextEditingController(text: currentName);
+    final textController = TextEditingController(text: currentName);
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('تعديل اسم الفصل'),
         content: TextField(
-          controller: controller,
+          controller: textController,
           decoration: const InputDecoration(labelText: 'اسم الفصل الجديد'),
         ),
         actions: [
@@ -76,23 +46,19 @@ class _ChaptersPageState extends State<ChaptersPage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final churchId = widget.ChurchID;
-              final name = controller.text.trim();
-              if (churchId == null || name.isEmpty) return;
-              await organizationController.updateChapter(
-                churchId: churchId,
-                chapterId: id,
-                season: name,
-              );
+              final name = textController.text.trim();
+              if (name.isEmpty) return;
+              await controller.updateChapterName(id, name);
               if (dialogContext.mounted) Navigator.pop(dialogContext);
-              await fetchChapters();
             },
             child: const Text('حفظ'),
           ),
         ],
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => textController.dispose(),
+    );
   }
 
   Future<void> showDeleteDialog(String chapterId) async {
@@ -109,7 +75,7 @@ class _ChaptersPageState extends State<ChaptersPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-              await deleteChapter(chapterId);
+              await controller.deleteChapter(chapterId);
             },
             child: const Text('نعم'),
           ),
@@ -119,11 +85,11 @@ class _ChaptersPageState extends State<ChaptersPage> {
   }
 
   void showChapterActions(OrganizationItem chapter) {
-    if (role == 'Admin') {
+    if (controller.role == 'Admin') {
       editChapterName(chapter.id, chapter.title);
       return;
     }
-    if (role != 'SuperAdmin') return;
+    if (controller.role != 'SuperAdmin') return;
 
     showModalBottomSheet<void>(
       context: context,
@@ -150,6 +116,69 @@ class _ChaptersPageState extends State<ChaptersPage> {
     );
   }
 
+  Widget _buildBody() {
+    if (controller.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (controller.chapters.isEmpty) {
+      return const Center(child: Text('لا توجد فصول حالياً'));
+    }
+    return _buildChaptersGrid();
+  }
+
+  Widget _buildChaptersGrid() {
+    return GridView.builder(
+      itemCount: controller.chapters.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.8,
+      ),
+      itemBuilder: (context, index) {
+        final chapter = controller.chapters[index];
+        return InkWell(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  RoomPage(ChurchID: widget.ChurchID, ChapterID: chapter.id),
+            ),
+          ),
+          onLongPress: () => showChapterActions(chapter),
+          child: Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('assets/images/Splash_View2.png', height: 100.h),
+                SizedBox(height: 10.h),
+                Text(
+                  chapter.title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget? _buildFab() {
+    if (controller.role != 'SuperAdmin') return null;
+    return FloatingActionButton(
+      backgroundColor: Colors.amber,
+      onPressed: () => showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AddChaptersBox(churchID: widget.ChurchID),
+      ).then((_) => controller.fetchChapters()),
+      child: const Icon(Icons.add),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,66 +190,8 @@ class _ChaptersPageState extends State<ChaptersPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(8.0.h),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : chapters.isEmpty
-            ? const Center(child: Text('لا توجد فصول حالياً'))
-            : GridView.builder(
-                itemCount: chapters.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 0.8,
-                ),
-                itemBuilder: (context, index) {
-                  final chapter = chapters[index];
-                  return InkWell(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => RoomPage(
-                          ChurchID: widget.ChurchID,
-                          ChapterID: chapter.id,
-                        ),
-                      ),
-                    ),
-                    onLongPress: () => showChapterActions(chapter),
-                    child: Card(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/Splash_View2.png',
-                            height: 100.h,
-                          ),
-                          SizedBox(height: 10.h),
-                          Text(
-                            chapter.title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-      ),
-      floatingActionButton: role == 'SuperAdmin'
-          ? FloatingActionButton(
-              backgroundColor: Colors.amber,
-              onPressed: () => showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => AddChaptersBox(churchID: widget.ChurchID),
-              ).then((_) => fetchChapters()),
-              child: const Icon(Icons.add),
-            )
-          : null,
+      body: Padding(padding: EdgeInsets.all(8.0.h), child: _buildBody()),
+      floatingActionButton: _buildFab(),
     );
   }
 }
