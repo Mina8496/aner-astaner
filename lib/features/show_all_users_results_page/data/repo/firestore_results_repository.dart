@@ -76,8 +76,7 @@ class FirestoreResultsRepository implements ResultsRepository {
               "bookTitle": "",
               "chapterTitle": "",
               "timestamp":
-                  (data['timestamp'] as Timestamp?)?.toDate() ??
-                      DateTime.now(),
+                  (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
               "scoreAyat": data['scoreAyat'] ?? 0,
               "totalQuestionsAyat": data['totalQuestionsAyat'] ?? 0,
             };
@@ -128,6 +127,11 @@ class FirestoreResultsRepository implements ResultsRepository {
         .collection('Results')
         .orderBy('date', descending: true)
         .snapshots()
-        .map((snap) => snap.docs.map((d) => d.data()).toList());
+        .map(
+          (snap) => snap.docs.map((d) {
+            final data = d.data();
+            return {...data, 'date': (data['date'] as Timestamp?)?.toDate()};
+          }).toList(),
+        );
   }
 }
