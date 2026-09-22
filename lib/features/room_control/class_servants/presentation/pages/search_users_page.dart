@@ -1,9 +1,8 @@
+import 'package:aner_astaner/features/room_control/class_servants/presentation/controllers/data_admain_churches_page_controller.dart';
 import 'package:aner_astaner/features/user/presentation/pages/edit_user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_summary.dart';
-import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 class DataAdmainChurchesPage extends StatefulWidget {
   final String? church;
@@ -20,26 +19,22 @@ class DataAdmainChurchesPage extends StatefulWidget {
 }
 
 class _DataAdmainChurchesPageState extends State<DataAdmainChurchesPage> {
-  String? selectedRole;
-  String searchQuery = '';
-  final userController = Get.find<UserController>();
+  late final DataAdmainChurchesPageController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = DataAdmainChurchesPageController(
+      churchId: widget.church,
+      chapterId: widget.chapter,
+      onStateChanged: () {
+        if (mounted) setState(() {});
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final usersStream = userController.watchUsersByOrganization(
-      churchId: widget.church!,
-      chapterId: widget.chapter!,
-      role: selectedRole,
-    );
-    // if (selectedChurch != null) {
-    //   usersQuery = usersQuery.where('Church', isEqualTo: selectedChurch);
-    // }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('قائمة المستخدمين'),
@@ -50,20 +45,7 @@ class _DataAdmainChurchesPageState extends State<DataAdmainChurchesPage> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            TextField(
-              decoration: InputDecoration(
-                hintText: '...ابحث باسم المستخدم',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.dg),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value.trim().toLowerCase();
-                });
-              },
-            ),
+            _buildSearchField(),
             SizedBox(height: 12.h),
             // Row(
             //   children: [
@@ -97,82 +79,7 @@ class _DataAdmainChurchesPageState extends State<DataAdmainChurchesPage> {
             //   ],
             // ),
             SizedBox(height: 12.h),
-            Expanded(
-              child: StreamBuilder<List<UserSummary>>(
-                stream: usersStream,
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final users = snapshot.data!
-                      .where(
-                        (user) => user.name.toLowerCase().contains(searchQuery),
-                      )
-                      .toList();
-
-                  if (users.isEmpty) {
-                    return const Center(
-                      child: Text('لا يوجد نتائج تطابق البحث'),
-                    );
-                  }
-
-                  return ListView.separated(
-                    itemCount: users.length,
-                    separatorBuilder: (context, _) => SizedBox(height: 10.h),
-                    itemBuilder: (context, index) {
-                      final user = users[index];
-                      final fullName = user.name;
-                      final email = user.email;
-                      final church = widget.church ?? '';
-                      final role = user.role;
-
-                      return Card(
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.dg),
-                        ),
-                        child: ListTile(
-                          title: Text(
-                            fullName,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(email, overflow: TextOverflow.ellipsis),
-                              Text(
-                                'الكنيسة: $church',
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.shield,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                              Text(role, overflow: TextOverflow.ellipsis),
-                            ],
-                          ),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => EditUserPage(userID: user.id),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
+            Expanded(child: _buildUsersList()),
           ],
         ),
       ),
@@ -187,6 +94,69 @@ class _DataAdmainChurchesPageState extends State<DataAdmainChurchesPage> {
       //   },
       //   child: const Icon(Icons.add),
       // ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: '...ابحث باسم المستخدم',
+        prefixIcon: Icon(Icons.search),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.dg)),
+      ),
+      onChanged: controller.updateSearchQuery,
+    );
+  }
+
+  Widget _buildUsersList() {
+    return StreamBuilder<List<UserSummary>>(
+      stream: controller.usersStream(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final users = controller.filterUsers(snapshot.data!);
+        if (users.isEmpty) {
+          return const Center(child: Text('لا يوجد نتائج تطابق البحث'));
+        }
+        return ListView.separated(
+          itemCount: users.length,
+          separatorBuilder: (context, _) => SizedBox(height: 10.h),
+          itemBuilder: (context, index) => _buildUserCard(users[index]),
+        );
+      },
+    );
+  }
+
+  Widget _buildUserCard(UserSummary user) {
+    final church = widget.church ?? '';
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.dg)),
+      child: ListTile(
+        title: Text(
+          user.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(user.email, overflow: TextOverflow.ellipsis),
+            Text('الكنيسة: $church', overflow: TextOverflow.ellipsis),
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.shield, size: 20, color: Colors.grey),
+            Text(user.role, overflow: TextOverflow.ellipsis),
+          ],
+        ),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => EditUserPage(userID: user.id)),
+        ),
+      ),
     );
   }
 }

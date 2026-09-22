@@ -78,77 +78,72 @@ class _AddDataAdmainChurchesPageState extends State<AddDataAdmainChurchesPage> {
       appBar: AppBar(title: const Text('إضافة امين فصل جديد')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _fullNameController,
-                decoration: const InputDecoration(labelText: 'الاسم الكامل'),
-                validator: (value) =>
-                    value!.isEmpty ? 'أدخل الاسم الكامل' : null,
-              ),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'البريد الإلكتروني',
-                ),
-                validator: (value) =>
-                    value!.isEmpty ? 'أدخل البريد الإلكتروني' : null,
-              ),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(labelText: 'كلمة المرور'),
-                validator: (value) => value!.length < 6
-                    ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'
-                    : null,
-              ),
-              TextFormField(
-                controller: _phoneController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'رقم الهاتف'),
-                validator: (value) => value!.isEmpty ? 'أدخل رقم الهاتف' : null,
-              ),
-              TextFormField(
-                controller: _churchController,
-                decoration: const InputDecoration(labelText: 'الكنيسة'),
-                validator: (value) => value!.isEmpty ? 'أدخل الكنيسة' : null,
-              ),
-              TextFormField(
-                controller: _seasonController,
-                decoration: const InputDecoration(labelText: 'السنة الدراسية'),
-                validator: (value) =>
-                    value!.isEmpty ? 'أدخل السنة الدراسية' : null,
-              ),
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'الدور'),
-                initialValue: _selectedRole,
-                items: ['User', 'Admin']
-                    .map(
-                      (role) =>
-                          DropdownMenuItem(value: role, child: Text(role)),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedRole = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton(
-                      onPressed: _saveUser,
-                      child: const Text('إضافة'),
-                    ),
-            ],
-          ),
-        ),
+        child: Form(key: _formKey, child: _buildFormFields()),
       ),
     );
+  }
+
+  Widget _buildFormFields() {
+    return ListView(
+      children: [
+        TextFormField(
+          controller: _fullNameController,
+          decoration: const InputDecoration(labelText: 'الاسم الكامل'),
+          validator: (value) => value!.isEmpty ? 'أدخل الاسم الكامل' : null,
+        ),
+        TextFormField(
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
+          validator: (value) =>
+              value!.isEmpty ? 'أدخل البريد الإلكتروني' : null,
+        ),
+        TextFormField(
+          controller: _passwordController,
+          obscureText: true,
+          keyboardType: TextInputType.text,
+          decoration: const InputDecoration(labelText: 'كلمة المرور'),
+          validator: (value) => value!.length < 6
+              ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'
+              : null,
+        ),
+        TextFormField(
+          controller: _phoneController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'رقم الهاتف'),
+          validator: (value) => value!.isEmpty ? 'أدخل رقم الهاتف' : null,
+        ),
+        TextFormField(
+          controller: _churchController,
+          decoration: const InputDecoration(labelText: 'الكنيسة'),
+          validator: (value) => value!.isEmpty ? 'أدخل الكنيسة' : null,
+        ),
+        TextFormField(
+          controller: _seasonController,
+          decoration: const InputDecoration(labelText: 'السنة الدراسية'),
+          validator: (value) => value!.isEmpty ? 'أدخل السنة الدراسية' : null,
+        ),
+        _buildRoleDropdown(),
+        const SizedBox(height: 20),
+        _buildSubmitButton(),
+      ],
+    );
+  }
+
+  DropdownButtonFormField<String> _buildRoleDropdown() {
+    return DropdownButtonFormField<String>(
+      decoration: const InputDecoration(labelText: 'الدور'),
+      initialValue: _selectedRole,
+      items: ['User', 'Admin']
+          .map((role) => DropdownMenuItem(value: role, child: Text(role)))
+          .toList(),
+      onChanged: (value) => setState(() => _selectedRole = value!),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : ElevatedButton(onPressed: _saveUser, child: const Text('إضافة'));
   }
 }

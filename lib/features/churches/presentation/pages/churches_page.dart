@@ -1,6 +1,6 @@
-import 'package:aner_astaner/features/alshahat/presentation/page/Chapters_Page.dart';
 import 'package:aner_astaner/features/churches/domain/entities/organization_item.dart';
 import 'package:aner_astaner/features/churches/presentation/controllers/churches_page_controller.dart';
+import 'package:aner_astaner/features/churches/presentation/pages/chapters_page.dart';
 import 'package:aner_astaner/features/churches/presentation/pages/widgets/Add_churches_Box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
