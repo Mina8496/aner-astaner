@@ -1,7 +1,7 @@
 import 'package:aner_astaner/core/constants/exam_constants.dart';
+import 'package:aner_astaner/features/alshahat/domain/entities/chapter_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../../../../chapter(alshahat)/domain/entities/chapter_model.dart';
 import '../../domain/repositories/exam_chapter_repository.dart';
 
 class FirestoreExamChapterRepository implements ExamChapterRepository {

@@ -1,6 +1,6 @@
-import 'package:aner_astaner/features/Login/presentation/page/Edit_User_Page.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_summary.dart';
 import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
+import 'package:aner_astaner/features/user/presentation/pages/edit_user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';

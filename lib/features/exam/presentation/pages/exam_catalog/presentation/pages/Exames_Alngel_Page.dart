@@ -1,13 +1,12 @@
-import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/widgets/Add_Exames_Alngel_Box.dart';
-import 'package:aner_astaner/features/room_control/alshahat/presentation/page/Exames_Alshahat_Page.dart';
-import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/domain/entities/catalog_item.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/controllers/exames_alngel_page_controller.dart';
+import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/pages/widgets/add_exames_alngel_box.dart';
+import 'package:aner_astaner/features/room_control/alshahat/presentation/page/exames_alshahat_page.dart';
 import 'package:aner_astaner/features/exam/presentation/pages/exam_catalog/presentation/controllers/exam_catalog_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 class ExamesAlngelPage extends StatefulWidget {
-
   const ExamesAlngelPage({Key? key, this.ChurchID, this.ChapterID})
     : super(key: key);
   final String? ChurchID;
@@ -18,27 +17,22 @@ class ExamesAlngelPage extends StatefulWidget {
 }
 
 class _ExamesAlngelPageState extends State<ExamesAlngelPage> {
-  List<CatalogItem> dataExames = [];
-  bool isLoading = true;
-  final controller = Get.find<ExamCatalogController>();
+  late final pageController = ExamesAlngelPageController(
+    catalogController: Get.find<ExamCatalogController>(),
+    churchId: widget.ChurchID,
+    chapterId: widget.ChapterID,
+  );
 
-  getDataExames() async {
-    if (widget.ChurchID == null || widget.ChapterID == null) return;
-    dataExames = await controller.fetchCategories(
-      churchId: widget.ChurchID!,
-      chapterId: widget.ChapterID!,
-    );
-
-    setState(() {
-      isLoading = false;
-    });
+  Future<void> _loadCategories() async {
+    await pageController.fetchCategories();
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
     if (widget.ChurchID != null && widget.ChapterID != null) {
-      getDataExames();
+      _loadCategories();
     } else {
       debugPrint("ChurchID or ChapterID is null!");
     }
@@ -67,14 +61,12 @@ class _ExamesAlngelPageState extends State<ExamesAlngelPage> {
             child: const Text("حفظ"),
             onPressed: () async {
               if (titleController.text.trim().isNotEmpty) {
-                await controller.updateCategory(
-                  churchId: widget.ChurchID!,
-                  chapterId: widget.ChapterID!,
+                await pageController.updateCategory(
                   categoryId: docId,
                   title: titleController.text.trim(),
                 );
                 Navigator.pop(ctx);
-                getDataExames();
+                setState(() {});
               }
             },
           ),
@@ -96,16 +88,16 @@ class _ExamesAlngelPageState extends State<ExamesAlngelPage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(8.0.h),
-        child: isLoading
+        child: pageController.isLoading
             ? const Center(child: CircularProgressIndicator())
             : GridView.builder(
-                itemCount: dataExames.length,
+                itemCount: pageController.examCategories.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2.bitLength,
                   mainAxisExtent: 160.spMax,
                 ),
                 itemBuilder: (context, i) {
-                  final exam = dataExames[i];
+                  final exam = pageController.examCategories[i];
                   return InkWell(
                     onTap: () {
                       Navigator.of(context).push(
@@ -124,7 +116,7 @@ class _ExamesAlngelPageState extends State<ExamesAlngelPage> {
                         builder: (ctx) => AlertDialog(
                           title: const Text('اختر إجراء'),
                           content: const Text(
-                            'هل تريد تعديل الاسم أم حذف السؤال؟',
+                            'هل تريد تعديل الاسم أم حذف السفر؟',
                           ),
                           actions: [
                             TextButton(
@@ -134,12 +126,8 @@ class _ExamesAlngelPageState extends State<ExamesAlngelPage> {
                               ),
                               onPressed: () async {
                                 Navigator.pop(ctx);
-                                await controller.deleteCategory(
-                                  churchId: widget.ChurchID!,
-                                  chapterId: widget.ChapterID!,
-                                  categoryId: exam.id,
-                                );
-                                await getDataExames();
+                                await pageController.deleteCategory(exam.id);
+                                setState(() {});
                               },
                             ),
                             TextButton(
@@ -185,7 +173,7 @@ class _ExamesAlngelPageState extends State<ExamesAlngelPage> {
               ChaptersID: widget.ChapterID,
               ChurchID: widget.ChurchID,
               onExameAdded: () {
-                getDataExames();
+                _loadCategories();
               },
             ),
           );
