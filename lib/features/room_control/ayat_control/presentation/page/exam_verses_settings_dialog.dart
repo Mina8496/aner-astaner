@@ -1,10 +1,6 @@
-import 'package:aner_astaner/core/constants/exam_constants.dart';
-import 'package:aner_astaner/features/user/domain/repositories/user_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:aner_astaner/features/room_control/ayat_control/presentation/controllers/exam_verses_settings_dialog_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 
 class ExamVersesSettingsDialog extends StatefulWidget {
   const ExamVersesSettingsDialog({super.key});
@@ -15,135 +11,73 @@ class ExamVersesSettingsDialog extends StatefulWidget {
 }
 
 class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
-  bool isRepeatable = false;
-  bool hasTimer = false;
-  bool isLoading = true;
-  bool isSaving = false;
-
-  String? churchId;
-  String? chapterId;
-  String? fullName;
-  String? season;
-
-  List<Map<String, dynamic>> versesList = [];
-  List<String> selectedVerses = [];
-
-  // التاريخ
-  DateTime? examStartDate;
-  DateTime? examEndDate;
-  int durationDays = 1;
-
-  // التايمر
-  double timerDuration = 30;
+  late final ExamVersesSettingsDialogController controller;
 
   @override
   void initState() {
     super.initState();
-    getUserData();
+    controller = ExamVersesSettingsDialogController(
+      onStateChanged: () { if (mounted) setState(() {}); },
+    );
+    controller.loadUserData();
   }
 
-  Future<void> getUserData() async {
-    final profile = await Get.find<UserRepository>().fetchCurrentUserProfile();
-
-    if (profile != null) {
-      churchId = profile.churchId;
-      chapterId = profile.chapterId;
-      fullName = profile.fullName;
-      season = profile.season;
-
-      await fetchVerses();
-      setState(() => isLoading = false);
+  Future<void> _handleSave() async {
+    final error = controller.validate();
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(key: UniqueKey(), content: Text(error)));
+      return;
+    }
+    try {
+      await controller.saveSettings();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(key: UniqueKey(), content: Text("تم حفظ إعدادات امتحان الآيات ✅")),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      controller.cancelSaving();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(key: UniqueKey(), content: Text("خطأ أثناء الحفظ: $e")),
+      );
     }
   }
 
-  Future<void> fetchVerses() async {
-    versesList.clear();
-    print("Fetching verses for ChurchID: $churchId, ChapterID: $chapterId");
-    final snapshot = await FirebaseFirestore.instance
-        .collection("Churches")
-        .doc(churchId)
-        .collection("Chapters")
-        .doc(chapterId)
-        .collection("Exames")
-        .doc(ExamConstants.fixedExamId)
-        .collection("AyatQuiz")
-        .get();
-
-    if (snapshot.docs.isEmpty) {
-      versesList.add({"id": "none", "title": "لا توجد آيات متاحة"});
-    } else {
-      for (var doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>? ?? {};
-
-        // لو فيه words، ناخد أول كلمة أو نكوّن منها جملة بسيطة
-        String verseTitle = "آية غير مسماة";
-        if (data.containsKey("words") && data["words"] is List) {
-          final words = List<String>.from(data["words"]);
-          verseTitle =
-              words.take(4).join(" ") + (words.length > 4 ? "..." : "");
-        }
-
-        versesList.add({"id": doc.id, "title": verseTitle});
-      }
-    }
-
-    setState(() {});
-  }
-
-  void showMultiVerseDialog() {
+  void _showMultiVerseDialog() {
     showDialog(
       context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setInnerState) {
-            return AlertDialog(
-              title: const Text("اختيار الآيات"),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: versesList.length,
-                  itemBuilder: (context, index) {
-                    final verse = versesList[index];
-                    final verseId = verse["id"];
-                    final verseTitle = verse["title"];
-
-                    return CheckboxListTile(
-                      value: selectedVerses.contains(verseId),
-                      title: Text(verseTitle),
-                      onChanged: (val) {
-                        setState(() {
-                          if (val == true) {
-                            selectedVerses.add(verseId);
-                          } else {
-                            selectedVerses.remove(verseId);
-                          }
-                        });
-                        // عشان يحدّث الواجهة داخل الـDialog نفسه
-                        setInnerState(() {});
-                      },
-                    );
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setInnerState) => AlertDialog(
+          title: const Text("اختيار الآيات"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: controller.versesList.length,
+              itemBuilder: (context, index) {
+                final verse = controller.versesList[index];
+                return CheckboxListTile(
+                  value: controller.selectedVerses.contains(verse.id),
+                  title: Text(verse.title),
+                  onChanged: (val) {
+                    controller.toggleVerseSelection(verse.id, val ?? false);
+                    setInnerState(() {});
                   },
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isSaving ? null : saveSettings,
-                  child: isSaving
-                      ? SizedBox(
-                          width: 16.w,
-                          height: 16.w,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text("تم"),
-                ),
-              ],
-            );
-          },
-        );
-      },
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: controller.isSaving ? null : _handleSave,
+              child: controller.isSaving
+                  ? SizedBox(width: 16.w, height: 16.w, child: const CircularProgressIndicator(strokeWidth: 2))
+                  : const Text("تم"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -151,170 +85,129 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("إعدادات امتحان الآيات"),
-      content: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // اختيار متعدد للآيات
-                  InkWell(
-                    onTap: showMultiVerseDialog,
-                    child: Container(
-                      width: 200.w,
-                      padding: EdgeInsets.symmetric(
-                        vertical: 10.h,
-                        horizontal: 12.w,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        selectedVerses.isEmpty
-                            ? "اختيار الآيات"
-                            : "عدد الآيات المحددة: ${selectedVerses.length}",
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+      content: controller.isLoading ? const Center(child: CircularProgressIndicator()) : _buildSettingsForm(),
+      actions: [TextButton(onPressed: _handleSave, child: const Text("تم"))],
+    );
+  }
 
-                  SizedBox(height: 15.h),
+  Widget _buildSettingsForm() {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildVersesPicker(),
+          SizedBox(height: 15.h),
+          _buildDateRangeRow(),
+          if (controller.examStartDate != null && controller.examEndDate != null) _buildDurationLabel(),
+          SizedBox(height: 10.h),
+          _buildRepeatableSwitch(),
+          _buildTimerSwitch(),
+          if (controller.hasTimer) _buildTimerSlider(),
+        ],
+      ),
+    );
+  }
 
-                  // اختيار التواريخ
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("تاريخ البداية:"),
-                            const SizedBox(height: 5),
-                            InkWell(
-                              onTap: () async {
-                                final pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: examStartDate ?? DateTime.now(),
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (pickedDate != null) {
-                                  setState(() {
-                                    examStartDate = pickedDate;
-                                    examEndDate ??= pickedDate.add(
-                                      const Duration(days: 1),
-                                    );
-                                    durationDays =
-                                        examEndDate!
-                                            .difference(examStartDate!)
-                                            .inDays +
-                                        1;
-                                  });
-                                }
-                              },
-                              child: _dateBox(
-                                examStartDate != null
-                                    ? "${examStartDate!.day}/${examStartDate!.month}/${examStartDate!.year}"
-                                    : "اختر التاريخ",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text("تاريخ النهاية:"),
-                            const SizedBox(height: 5),
-                            InkWell(
-                              onTap: () async {
-                                final pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate:
-                                      examEndDate ??
-                                      (examStartDate ?? DateTime.now()).add(
-                                        const Duration(days: 1),
-                                      ),
-                                  firstDate: examStartDate ?? DateTime.now(),
-                                  lastDate: DateTime(2100),
-                                );
-                                if (pickedDate != null) {
-                                  setState(() {
-                                    examEndDate = pickedDate;
-                                    durationDays =
-                                        examEndDate!
-                                            .difference(examStartDate!)
-                                            .inDays +
-                                        1;
-                                  });
-                                }
-                              },
-                              child: _dateBox(
-                                examEndDate != null
-                                    ? "${examEndDate!.day}/${examEndDate!.month}/${examEndDate!.year}"
-                                    : "اختر التاريخ",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+  Widget _buildVersesPicker() {
+    return InkWell(
+      onTap: _showMultiVerseDialog,
+      child: Container(
+        width: 200.w,
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)],
+        ),
+        child: Text(
+          controller.selectedVerses.isEmpty
+              ? "اختيار الآيات"
+              : "عدد الآيات المحددة: ${controller.selectedVerses.length}",
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
 
-                  if (examStartDate != null && examEndDate != null)
-                    Padding(
-                      padding: EdgeInsets.only(top: 8.h),
-                      child: Text(
-                        "مدة الامتحان: $durationDays يوم",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+  Widget _buildDateRangeRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildDateColumn(
+            label: "تاريخ البداية:",
+            date: controller.examStartDate,
+            onTap: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: controller.examStartDate ?? DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime(2100),
+              );
+              if (pickedDate != null) controller.setExamStartDate(pickedDate);
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildDateColumn(
+            label: "تاريخ النهاية:",
+            date: controller.examEndDate,
+            onTap: () async {
+              final pickedDate = await showDatePicker(
+                context: context,
+                initialDate: controller.examEndDate ??
+                    (controller.examStartDate ?? DateTime.now()).add(const Duration(days: 1)),
+                firstDate: controller.examStartDate ?? DateTime.now(),
+                lastDate: DateTime(2100),
+              );
+              if (pickedDate != null) controller.setExamEndDate(pickedDate);
+            },
+          ),
+        ),
+      ],
+    );
+  }
 
-                  SizedBox(height: 10.h),
+  Widget _buildDateColumn({required String label, required DateTime? date, required VoidCallback onTap}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        const SizedBox(height: 5),
+        InkWell(onTap: onTap, child: _dateBox(date != null ? "${date.day}/${date.month}/${date.year}" : "اختر التاريخ")),
+      ],
+    );
+  }
 
-                  SwitchListTile(
-                    title: const Text("هل الامتحان يتكرر؟"),
-                    value: isRepeatable,
-                    onChanged: (val) => setState(() => isRepeatable = val),
-                  ),
+  Widget _buildDurationLabel() {
+    return Padding(
+      padding: EdgeInsets.only(top: 8.h),
+      child: Text("مدة الامتحان: ${controller.durationDays} يوم", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+    );
+  }
 
-                  SwitchListTile(
-                    title: const Text("هل يحتوي على تايمر؟"),
-                    value: hasTimer,
-                    onChanged: (val) => setState(() => hasTimer = val),
-                  ),
+  Widget _buildRepeatableSwitch() {
+    return SwitchListTile(title: const Text("هل الامتحان يتكرر؟"), value: controller.isRepeatable, onChanged: controller.setIsRepeatable);
+  }
 
-                  if (hasTimer) ...[
-                    const SizedBox(height: 10),
-                    Text(
-                      "مدة التايمر: ${timerDuration.toInt()} ثانية",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Slider(
-                      value: timerDuration,
-                      min: 20,
-                      max: 60,
-                      divisions: 8,
-                      label: "${timerDuration.toInt()} ثانية",
-                      onChanged: (value) =>
-                          setState(() => timerDuration = value),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-      actions: [TextButton(onPressed: saveSettings, child: const Text("تم"))],
+  Widget _buildTimerSwitch() {
+    return SwitchListTile(title: const Text("هل يحتوي على تايمر؟"), value: controller.hasTimer, onChanged: controller.setHasTimer);
+  }
+
+  Widget _buildTimerSlider() {
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        Text("مدة التايمر: ${controller.timerDuration.toInt()} ثانية", style: const TextStyle(fontWeight: FontWeight.bold)),
+        Slider(
+          value: controller.timerDuration,
+          min: 20,
+          max: 60,
+          divisions: 8,
+          label: "${controller.timerDuration.toInt()} ثانية",
+          onChanged: controller.setTimerDuration,
+        ),
+      ],
     );
   }
 
@@ -324,82 +217,9 @@ class _ExamVersesSettingsDialogState extends State<ExamVersesSettingsDialog> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)],
       ),
       child: Text(text),
     );
-  }
-
-  Future<void> saveSettings() async {
-    if (selectedVerses.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          key: UniqueKey(),
-          content: Text("يجب اختيار آية واحدة على الأقل"),
-        ),
-      );
-      return;
-    }
-
-    if (examStartDate == null || examEndDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(key: UniqueKey(), content: Text("يجب تحديد التواريخ")),
-      );
-      return;
-    }
-
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    setState(() => isSaving = true);
-
-    final selectedTitles = versesList
-        .where((v) => selectedVerses.contains(v["id"]))
-        .map((v) => v["title"])
-        .toList();
-
-    final dataToSave = {
-      'versesIds': selectedVerses,
-      'versesTitles': selectedTitles,
-      'durationDays': durationDays,
-      'examStart': Timestamp.fromDate(examStartDate!),
-      'examEnd': Timestamp.fromDate(examEndDate!),
-      'isRepeatable': isRepeatable,
-      'hasTimer': hasTimer,
-      'timerDuration': hasTimer ? timerDuration.toInt() : null,
-      'timestamp': FieldValue.serverTimestamp(),
-      'userFullName': fullName,
-      'userId': user.uid,
-      'season': season,
-    };
-
-    try {
-      await FirebaseFirestore.instance
-          .collection("Churches")
-          .doc(churchId)
-          .collection("Chapters")
-          .doc(chapterId)
-          .collection("Exames")
-          .doc(ExamConstants.fixedExamId)
-          .collection("VersesSettings")
-          .add(dataToSave);
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          key: UniqueKey(),
-          content: Text("تم حفظ إعدادات امتحان الآيات ✅"),
-        ),
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(key: UniqueKey(), content: Text("خطأ أثناء الحفظ: $e")),
-      );
-    }
   }
 }
