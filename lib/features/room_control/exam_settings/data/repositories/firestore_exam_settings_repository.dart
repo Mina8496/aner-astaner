@@ -24,6 +24,30 @@ class FirestoreExamSettingsRepository implements ExamSettingsRepository {
     churchId: churchId,
     chapterId: chapterId,
   );
+  
+  @override
+  Future<void> createSetting({
+    required String churchId,
+    required String chapterId,
+    required ExamSetting setting,
+  }) {
+    return _settings(churchId: churchId, chapterId: chapterId).add({
+      'bookId': setting.bookId,
+      'chapterId': setting.chapterId,
+      'bookTitle': setting.bookTitle,
+      'chapterTitle': setting.chapterTitle,
+      'durationDays': setting.durationDays,
+      'examStart': Timestamp.fromDate(setting.examStart!),
+      'examEnd': Timestamp.fromDate(setting.examEnd!),
+      'isRepeatable': setting.isRepeatable,
+      'hasTimer': setting.hasTimer,
+      'timerDuration': setting.hasTimer ? setting.timerDuration : null,
+      'timestamp': FieldValue.serverTimestamp(),
+      'userFullName': setting.userFullName,
+      'userId': setting.userId,
+      'season': setting.season,
+    });
+  }
 
   @override
   Future<ExamSelection?> fetchCurrentSelection() async {

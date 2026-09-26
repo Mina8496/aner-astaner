@@ -8,15 +8,19 @@ abstract interface class ExamSettingsRepository {
     required String churchId,
     required String chapterId,
   });
-
   Future<List<ExamSetting>> fetchAllSettings({
     required String churchId,
     required String chapterId,
   });
-
   Future<void> deleteSetting({
     required String churchId,
     required String chapterId,
     required String settingId,
+  });
+
+  Future<void> createSetting({
+    required String churchId,
+    required String chapterId,
+    required ExamSetting setting,
   });
 }

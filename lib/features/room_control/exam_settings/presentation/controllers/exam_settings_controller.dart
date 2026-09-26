@@ -9,6 +9,16 @@ class ExamSettingsController {
 
   final ExamSettingsRepository _repository;
 
+  Future<void> createSetting({
+    required String churchId,
+    required String chapterId,
+    required ExamSetting setting,
+  }) => _repository.createSetting(
+    churchId: churchId,
+    chapterId: chapterId,
+    setting: setting,
+  );
+
   Future<ExamSelection?> fetchCurrentSelection() =>
       _repository.fetchCurrentSelection();
 

@@ -13,6 +13,10 @@ class ExamSetting {
     required this.examStart,
     required this.examEnd,
     this.createdAt,
+    this.timerDuration,
+    this.userFullName,
+    this.userId,
+    this.season,
   });
 
   final String id;
@@ -26,6 +30,10 @@ class ExamSetting {
   final DateTime? examStart;
   final DateTime? examEnd;
   final DateTime? createdAt;
+  final int? timerDuration;
+  final String? userFullName;
+  final String? userId;
+  final String? season;
 
   factory ExamSetting.fromMap(Map<String, dynamic> data) {
     return ExamSetting(
@@ -40,6 +48,10 @@ class ExamSetting {
       examStart: (data['examStart'] as Timestamp?)?.toDate(),
       examEnd: (data['examEnd'] as Timestamp?)?.toDate(),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
+      timerDuration: (data['timerDuration'] as num?)?.toInt(),
+      userFullName: data['userFullName'] as String?,
+      userId: data['userId'] as String?,
+      season: data['season'] as String?,
     );
   }
 
