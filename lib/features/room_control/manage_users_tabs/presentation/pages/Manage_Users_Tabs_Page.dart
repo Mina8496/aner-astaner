@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aner_astaner/features/user/domain/entities/user_summary.dart';
-import 'package:aner_astaner/features/user/presentation/controllers/user_controller.dart';
-import 'package:get/get.dart';
+import 'package:aner_astaner/features/room_control/manage_users_tabs/presentation/controllers/manage_users_page_controller.dart';
 
 class ManageUsersPage extends StatefulWidget {
   final String churchId;
@@ -19,10 +18,8 @@ class ManageUsersPage extends StatefulWidget {
 
 class _ManageUsersPageState extends State<ManageUsersPage>
     with SingleTickerProviderStateMixin {
-  late String currentChurch;
-  late String currentClass;
+  late final ManageUsersPageController controller;
   late TabController _tabController;
-  final userController = Get.find<UserController>();
 
   @override
   void initState() {
@@ -30,9 +27,10 @@ class _ManageUsersPageState extends State<ManageUsersPage>
 
     _tabController = TabController(length: 3, vsync: this);
 
-    // ✅ القيم جاية من الصفحة السابقة
-    currentChurch = widget.churchId.trim();
-    currentClass = widget.chapterId.trim();
+    controller = ManageUsersPageController(
+      churchId: widget.churchId,
+      chapterId: widget.chapterId,
+    );
   }
 
   @override
@@ -40,13 +38,6 @@ class _ManageUsersPageState extends State<ManageUsersPage>
     _tabController.dispose();
     super.dispose();
   }
-
-  Stream<List<UserSummary>> usersStream(String status) =>
-      userController.watchUsers(
-        churchId: currentChurch,
-        chapterId: currentClass,
-        status: status == 'all' ? 'pending' : status,
-      );
 
   void showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -58,7 +49,7 @@ class _ManageUsersPageState extends State<ManageUsersPage>
     );
   }
 
-  Widget buildUsersList(Stream<List<UserSummary>> stream, String tab) {
+  Widget _buildUsersList(Stream<List<UserSummary>> stream, String tab) {
     return StreamBuilder<List<UserSummary>>(
       stream: stream,
       builder: (context, snapshot) {
@@ -71,8 +62,8 @@ class _ManageUsersPageState extends State<ManageUsersPage>
           return const Center(child: Text("لا يوجد مستخدمين"));
         }
 
-        print("My Church: $currentChurch");
-        print("My Chapter: $currentClass");
+        print("My Church: ${controller.currentChurch}");
+        print("My Chapter: ${controller.currentClass}");
 
         return ListView.builder(
           itemCount: users.length,
@@ -96,7 +87,7 @@ class _ManageUsersPageState extends State<ManageUsersPage>
                           color: Colors.green,
                         ),
                         onPressed: () {
-                          userController
+                          controller
                               .updateUserStatus(user.id, 'correct')
                               .then((_) {
                                 showSnackBar("✅ تم نقل $fullName إلى موافق");
@@ -107,7 +98,7 @@ class _ManageUsersPageState extends State<ManageUsersPage>
                       IconButton(
                         icon: const Icon(Icons.cancel, color: Colors.red),
                         onPressed: () {
-                          userController
+                          controller
                               .updateUserStatus(user.id, 'wrong')
                               .then((_) {
                                 showSnackBar(
@@ -121,7 +112,7 @@ class _ManageUsersPageState extends State<ManageUsersPage>
                       IconButton(
                         icon: const Icon(Icons.undo, color: Colors.blue),
                         onPressed: () {
-                          userController
+                          controller
                               .updateUserStatus(user.id, 'pending')
                               .then((_) {
                                 showSnackBar(
@@ -143,30 +134,34 @@ class _ManageUsersPageState extends State<ManageUsersPage>
 
   @override
   Widget build(BuildContext context) {
-    // if (currentChurch == null || currentClass == null) {
-    //   return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    // }
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("إدارة المخدومين"),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: "قيد المراجعة"),
-            Tab(text: "موافق"),
-            Tab(text: "غير موافق"),
-          ],
-        ),
-      ),
-      body: TabBarView(
+      appBar: _buildAppBar(),
+      body: _buildTabBarView(),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      title: const Text("إدارة المخدومين"),
+      bottom: TabBar(
         controller: _tabController,
-        children: [
-          buildUsersList(usersStream("all"), "all"),
-          buildUsersList(usersStream("correct"), "correct"),
-          buildUsersList(usersStream("wrong"), "wrong"),
+        tabs: const [
+          Tab(text: "قيد المراجعة"),
+          Tab(text: "موافق"),
+          Tab(text: "غير موافق"),
         ],
       ),
+    );
+  }
+
+  Widget _buildTabBarView() {
+    return TabBarView(
+      controller: _tabController,
+      children: [
+        _buildUsersList(controller.usersStream("all"), "all"),
+        _buildUsersList(controller.usersStream("correct"), "correct"),
+        _buildUsersList(controller.usersStream("wrong"), "wrong"),
+      ],
     );
   }
 }
